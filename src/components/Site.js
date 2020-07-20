@@ -13,8 +13,11 @@ import React, { useState } from 'react';
 import { SnackbarProvider } from 'notistack';
 
 // Material UI
-import { ThemeProvider } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline'
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
 // Generic modules
 import Events from '../generic/events';
@@ -29,6 +32,11 @@ import Alerts from './composites/Alerts';
 import Header from './composites/Header';
 import NoUser from './dialogs/NoUser';
 
+// Tab component modules
+import Dashboard from './tabs/Dashboard';
+import Personal from './tabs/Personal';
+import Prescriptions from './tabs/Prescriptions';
+
 // CSS Theme
 import Theme from './Theme'
 
@@ -40,9 +48,10 @@ Rest.init(process.env.REACT_APP_MEMS_DOMAIN, xhr => {
 
 	// If we got a 401, let everyone know we signed out
 	if(xhr.status === 401) {
-		Events.trigger('error', 'Your previous session has expired');
+		Events.trigger('error', 'Your session has expired');
 		Events.trigger('signedOut');
 	} else {
+		console.error('Rest call failed: ', xhr);
 		Events.trigger('error',
 			'Unable to connect to ' + process.env.REACT_APP_MEMS_DOMAIN +
 			': ' + xhr.statusText +
@@ -69,43 +78,89 @@ window.Events = Events;
 // Hide the loader
 LoaderHide();
 
-window.loaderHide = LoaderHide;
-window.loaderShow = LoaderShow;
-
 // Init the Hash module
 Hash.init();
 
-// Site
-function Site(props) {
+// Theme
+const useStyles = makeStyles((theme) => ({
+	content: {
+		flexBasis: 0,
+		flexGrow: 1,
+		flexShrink: 1,
+		height: '100%',
+		overflow: 'auto',
+		padding: '10px'
+	},
+	site: {
+		display: 'flex',
+		flexDirection: 'column',
+		height: '100%'
+	},
+	tabs: {
+		flexGrow: 0,
+		flexShrink: 0
+	}
+}));
+
+/**
+ * Site
+ *
+ * Primary component of the site
+ *
+ * @name Site
+ * @param Object props Properties passed to the component
+ * @return React.Component
+ */
+export default function Site(props) {
+
+	// Styles
+	const classes = useStyles();
 
 	// State
-	let [user, setUser] = useState(false);
+	let [tab, tabSet] = useState(0);
+	let [user, userSet] = useState(false);
 
-	// User hooks
-	useEvent('signedIn', user => setUser(user));
-	useEvent('signedOut', () => setUser(false));
+	// hooks
+	useEvent('signedIn', user => userSet(user));
+	useEvent('signedOut', () => userSet(false));
 
-	// Return the Site
+	// Render
 	return (
 		<SnackbarProvider maxSnack={3}>
 			<Alerts />
 			<ThemeProvider theme={Theme}>
 				<CssBaseline />
-				<div id="site">
+				<div className={classes.site}>
 					{user === false &&
 						<NoUser />
 					}
 					<Header
 						user={user}
 					/>
-					<div id="content">
-
+					<AppBar position="static" color="default" className={classes.tabs}>
+						<Tabs
+							onChange={(ev, newTab) => tabSet(newTab)}
+							value={tab}
+							variant="fullWidth"
+						>
+							<Tab label="Dashboard" />
+							<Tab label="Personal Info" />
+							<Tab label="Prescriptions" />
+						</Tabs>
+					</AppBar>
+					<div className={classes.content}>
+						{tab === 0 &&
+							<Dashboard user={user} />
+						}
+						{tab === 1 &&
+							<Personal user={user} />
+						}
+						{tab === 2 &&
+							<Prescriptions user={user} />
+						}
 					</div>
 				</div>
 			</ThemeProvider>
 		</SnackbarProvider>
 	);
 }
-
-// Export the app
-export default Site;

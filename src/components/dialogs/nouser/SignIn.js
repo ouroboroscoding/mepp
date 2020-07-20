@@ -105,8 +105,11 @@ export default function Signin(props) {
 						}
 						errorsSet(errors);
 						break;
-					case 1201:
+					case 1901:
 						Events.trigger('error', 'E-mail or password invalid');
+						break;
+					case 1908:
+						Events.trigger('error', 'Account not verified. Please check your email for verification link.');
 						break;
 					default:
 						Events.trigger('error', JSON.stringify(res.error));

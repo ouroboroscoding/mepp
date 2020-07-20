@@ -33,21 +33,41 @@ import Utils from '../../utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
+	appbar: {
+		flexGrow: 0,
+		flexShrink: 0
+	},
 	toolbar: {
 		display: 'flex',
 		padding: '10px',
 		'& .MuiIconButton-root': {
-			color: 'rgba(255, 255, 255, 0.54)'
+			color: 'rgba(255, 255, 255, 0.54)',
+			padding: '5px',
+			[theme.breakpoints.down('sm')]: {
+				padding: 0
+			}
 		},
 		'& .MuiSvgIcon-root': {
-			fontSize: '2rem'
+			fontSize: '2rem',
+			[theme.breakpoints.down('sm')]: {
+				fontSize: '1.5rem'
+			}
 		}
 	},
 	tag: {
 		flexGrow: 0,
 		fontFamily: 'ITCAvantGardePro-Bk',
 		fontSize: '16px',
-		textAlign: 'right'
+		textAlign: 'right',
+		[theme.breakpoints.down('sm')]: {
+			fontSize: '10px'
+		},
+		'& img': {
+			width: '240px',
+			[theme.breakpoints.down('sm')]: {
+				width: '180px'
+			}
+		}
 	},
 	loader: {
 		flexGrow: 1,
@@ -91,27 +111,25 @@ export default function Header(props) {
 
 	// Render the page
 	return (
-		<div id="header">
-			<AppBar position="relative">
-				<Toolbar className={classes.toolbar}>
-					<div className={classes.tag}>
-						<img src="/images/logo.png" alt="MaleExcel Logo" style={{width: '240px'}} />
-						<div>Making Health Care Easy</div>
-					</div>
-					<div className={classes.loader}>
-						<Loader />
-					</div>
-					{props.user &&
-						<React.Fragment>
-							<Tooltip title="Sign Out">
-								<IconButton onClick={signout}>
-									<ExitToAppIcon />
-								</IconButton>
-							</Tooltip>
-						</React.Fragment>
-					}
-				</Toolbar>
-			</AppBar>
-		</div>
+		<AppBar position="relative" className={classes.appbar}>
+			<Toolbar className={classes.toolbar}>
+				<div className={classes.tag}>
+					<img src="/images/logo.png" alt="MaleExcel Logo" style={{}} />
+					<div>Making Health Care Easy</div>
+				</div>
+				<div className={classes.loader}>
+					<Loader />
+				</div>
+				{props.user &&
+					<React.Fragment>
+						<Tooltip title="Sign Out">
+							<IconButton onClick={signout}>
+								<ExitToAppIcon />
+							</IconButton>
+						</Tooltip>
+					</React.Fragment>
+				}
+			</Toolbar>
+		</AppBar>
 	);
 }
