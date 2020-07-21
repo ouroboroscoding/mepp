@@ -115,7 +115,7 @@ export default function Personal(props) {
 	}, [props.user]); // React to user changes
 
 	// Update the e-mail address used for signing in
-	function accountEmail(email) {
+	function accountEmail(email, success) {
 
 		// Fetch all info
 		Rest.update('patient', 'account/email', {
@@ -124,12 +124,21 @@ export default function Personal(props) {
 
 			// If there's an error
 			if(res.error && !Utils.restError(res.error)) {
-				Events.trigger('error', JSON.stringify(res.error));
+				if(res.error.code === 1900) {
+					Events.trigger('error', 'This E-mail address is already in use and can\'t be saved.');
+				} else {
+					Events.trigger('error', JSON.stringify(res.error));
+				}
 			}
 
 			// If there's a warning
 			if(res.warning) {
 				Events.trigger('warning', JSON.stringify(res.warning));
+			}
+
+			// On success
+			if(res.data) {
+				success();
 			}
 		});
 	}
@@ -210,8 +219,8 @@ export default function Personal(props) {
 		if(email) {
 			// Only update if the data is different
 			if(!Tools.compare(email, info.email)) {
-				update('email', email, emailSet, () => {
-					accountEmail(email);
+				accountEmail(email, () => {
+					update('email', email, emailSet);
 				});
 			} else {
 				emailSet(false);
@@ -358,7 +367,7 @@ export default function Personal(props) {
 							<TableCell className="content">{billing ?
 								<Address name="billing" onChange={ev => billingSet(ev.currentTarget.value)} value={billing} /> :
 								<React.Fragment>
-									<p>{info.billing.firstName}, {info.billing.lastName}</p>
+									<p>{info.billing.firstName} {info.billing.lastName}</p>
 									{info.billing.company &&
 										<p>{info.billing.company}</p>
 									}
@@ -382,7 +391,7 @@ export default function Personal(props) {
 									/>
 								</Box> :
 								<React.Fragment>
-									<p>{info.shipping.firstName}, {info.shipping.lastName}</p>
+									<p>{info.shipping.firstName} {info.shipping.lastName}</p>
 									{info.shipping.company &&
 										<p>{info.shipping.company}</p>
 									}

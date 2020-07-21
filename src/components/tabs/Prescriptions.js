@@ -93,7 +93,7 @@ export default function Prescriptions(props) {
 
 	// If we are loading
 	if(records === null) {
-		return <Box>Loading...</Box>;
+		return <Box className={classes.box}>Loading...</Box>;
 	} else {
 		return (
 			<Box className={classes.box}>

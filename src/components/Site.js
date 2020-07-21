@@ -144,7 +144,7 @@ export default function Site(props) {
 							variant="fullWidth"
 						>
 							<Tab label="Dashboard" />
-							<Tab label="Personal Info" />
+							<Tab label="Personal" />
 							<Tab label="Prescriptions" />
 						</Tabs>
 					</AppBar>
