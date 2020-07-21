@@ -177,7 +177,7 @@ export default function Dashboard(props) {
 	if(purchases === null) {
 		lRender.push(<Box>Loading...</Box>);
 	} else {
-		lRender.push(...purchases.map((o, i) =>
+		lRender.push(...purchases.filter(o => o.status === 'ACTIVE').map((o, i) =>
 			<Paper className={classes.paper} key={i}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
 					<Grid item xs={12}><strong>{o.product}</strong></Grid>
