@@ -156,10 +156,10 @@ export default function Dashboard(props) {
 
 	// If we are loading
 	if(tracking === null) {
-		lRender.push(<Box>Loading...</Box>);
+		lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
 	} else {
 		lRender.push(
-			<Paper className={classes.paper}>
+			<Paper key={'r' + lRender.length} className={classes.paper}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
 					<Grid item xs={12}><strong>Tracking Codes</strong></Grid>
 					{tracking.slice(0,3).map((o,i) =>
@@ -175,17 +175,17 @@ export default function Dashboard(props) {
 
 	// If we are loading
 	if(purchases === null) {
-		lRender.push(<Box>Loading...</Box>);
+		lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
 	} else {
 		lRender.push(...purchases.filter(o => o.status === 'ACTIVE').map((o, i) =>
 			<Paper className={classes.paper} key={i}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
 					<Grid item xs={12}><strong>{o.product}</strong></Grid>
-					<Grid item xs={4}>Last Order</Grid>
-					<Grid item xs={4}>{o.latest ? o.latest.date.substr(0, 10) : 'No Order found'}</Grid>
+					<Grid item xs={4}>Last Billed Date</Grid>
+					<Grid item xs={4}>{o.latest ? Utils.niceDate(o.latest.date) : 'No Order found'}</Grid>
 					<Grid item xs={4}>{o.latest ? ('$' + o.latest.price.toFixed(2)) : ''}</Grid>
-					<Grid item xs={4}>Next Refill</Grid>
-					<Grid item xs={4}>{o.nextBillDate ? o.nextBillDate.substr(0, 10) : 'No Future Refills'}</Grid>
+					<Grid item xs={4}>Next Refill Billed</Grid>
+					<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
 					<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
 				</Grid>
 			</Paper>

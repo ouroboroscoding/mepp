@@ -19,6 +19,7 @@ import { makeStyles } from '@material-ui/core/styles';
 // Generic modules
 import Events from '../../generic/events';
 import Rest from '../../generic/rest';
+import Tools from '../../generic/tools';
 
 // Local modules
 import Utils from '../../utils';
@@ -86,26 +87,45 @@ export default function Prescriptions(props) {
 			if(res.data) {
 
 				// Set the records
-				recordsSet(res.data);
+				recordsSet(res.data.filter(o => filterRx(o)));
 			}
 		});
+	}
+
+	function filterRx(rx) {
+
+		// If the status is invalid
+		if(rx.Status > 5 && rx.Status < 9) {
+			return false;
+		}
+
+		// If it's expired
+		let oDate = new Date(rx.EffectiveDate ? rx.EffectiveDate : rx.WrittenDate);
+		if(oDate < Tools.dateInc(-365)) {
+			return false;
+		}
+
+		// OK
+		return true;
 	}
 
 	// If we are loading
 	if(records === null) {
 		return <Box className={classes.box}>Loading...</Box>;
+	} else if(records.length === 0) {
+		return <Box className={classes.box}>No active prescriptions found</Box>
 	} else {
 		return (
 			<Box className={classes.box}>
-				{records.filter(o => (o.Status < 6 || o.Status > 8)).map((o,i) => {
+				{records.map((o,i) => {
 					return (
 						<Paper key={i} className={classes.rx}>
 							<p><strong>Pharmacy: </strong><span>{o.PharmacyName}</span></p>
 							<p><strong>Prescriber: </strong><span>{o.PrescriberName}</span></p>
 							<p><strong>Product: </strong><span>{o.DisplayName} ({o.Quantity})</span></p>
-							<p><strong>Written: </strong><span>{o.WrittenDate.substring(0, 10)}</span></p>
+							<p><strong>Written: </strong><span>{Utils.niceDate(o.WrittenDate)}</span></p>
 							{o.EffectiveDate &&
-								<p><strong>Effective: </strong><span>{o.EffectiveDate.substring(0, 10)}</span></p>
+								<p><strong>Effective: </strong><span>{Utils.niceDate(o.EffectiveDate)}</span></p>
 							}
 							<p><strong>Status: </strong><span>{o.StatusText}</span></p>
 							<p><strong>Medication Status: </strong><span>{o.MedicationStatusText}</span></p>

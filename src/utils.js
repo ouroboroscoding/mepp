@@ -97,6 +97,11 @@ export default {
 		return '(' + lMatch[1] + ') ' + lMatch[2] + '-' + lMatch[3];
 	},
 
+	niceDate: function(val) {
+		let d = new Date(val);
+		return d.toDateString();
+	},
+
 	restError: function(err) {
 
 		// What error is it?
