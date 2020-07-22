@@ -192,7 +192,7 @@ export default function Dashboard(props) {
 						<span>No tracking available yet.</span> :
 						tracking.slice(0,3).map((o,i) =>
 							<React.Fragment>
-								<Grid item xs={4}>{o.date}</Grid>
+								<Grid item xs={4}>{Utils.niceDate(o.date + 'T00:00:00')}</Grid>
 								<Grid item xs={8}>{o.type} <Link color="secondary" href={o.link} target="_blank">{o.code}</Link></Grid>
 							</React.Fragment>
 						)
