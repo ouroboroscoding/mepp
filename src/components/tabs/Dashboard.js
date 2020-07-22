@@ -14,11 +14,19 @@ import React, { useState, useEffect } from 'react';
 
 // Material UI
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles';
+
+// Shared functions
+import supportRequest from '../functions/supportRequest';
 
 // Generic modules
 import Events from '../../generic/events';
@@ -32,6 +40,9 @@ const useStyles = makeStyles((theme) => ({
 	box: {
 		margin: '0 auto',
 		maxWidth: '640px'
+	},
+	cancel: {
+		textAlign: 'right'
 	},
 	child: {
 		textAlign: 'center'
@@ -62,6 +73,7 @@ export default function Dashboard(props) {
 	const classes = useStyles();
 
 	// State
+	let [cancel, cancelSet] = useState(null);
 	let [purchases, purchasesSet] = useState(null);
 	let [tracking, trackingSet] = useState(null);
 
@@ -155,6 +167,10 @@ export default function Dashboard(props) {
 		}
 	}
 
+	function toggleCancel() {
+		cancelSet(val => !val);
+	}
+
 	// Render elements
 	let lRender = []
 
@@ -172,12 +188,15 @@ export default function Dashboard(props) {
 			<Paper key={'r' + lRender.length} className={classes.paper}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
 					<Grid item xs={12}><strong>Tracking Codes</strong></Grid>
-					{tracking.slice(0,3).map((o,i) =>
-						<React.Fragment>
-							<Grid item xs={4}>{o.date}</Grid>
-							<Grid item xs={8}>{o.type} <Link color="secondary" href={o.link} target="_blank">{o.code}</Link></Grid>
-						</React.Fragment>
-					)}
+					{tracking.length === 0 ?
+						<span>No tracking available yet.</span> :
+						tracking.slice(0,3).map((o,i) =>
+							<React.Fragment>
+								<Grid item xs={4}>{o.date}</Grid>
+								<Grid item xs={8}>{o.type} <Link color="secondary" href={o.link} target="_blank">{o.code}</Link></Grid>
+							</React.Fragment>
+						)
+					}
 				</Grid>
 			</Paper>
 		);
@@ -197,9 +216,36 @@ export default function Dashboard(props) {
 					<Grid item xs={4}>Next Charged Date</Grid>
 					<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
 					<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
+					<Grid className={classes.cancel} item xs={12}>
+						<Button variant="contained" color="primary" onClick={toggleCancel}>Cancel Order</Button>
+					</Grid>
 				</Grid>
 			</Paper>
 		));
+	}
+
+	// If cancel clicked
+	if(cancel) {
+		lRender.push(
+			<Dialog
+				fullWidth={true}
+				key={'r' + lRender.length}
+				maxWidth="sm"
+				onClose={toggleCancel}
+				open={true}
+			>
+				<DialogTitle>Cancel Order</DialogTitle>
+				<DialogContent dividers>
+					<p>To cancel your order please contact support or click the
+					button below to have a support agent contact you as soon as
+					one is available.</p>
+				</DialogContent>
+				<DialogActions>
+					<Button variant="contained" color="secondary" onClick={toggleCancel}>Cancel</Button>
+					<Button variant="contained" color="primary" onClick={ev => supportRequest('cancel_order', () => cancelSet(false))}>Have Support Contact You</Button>
+				</DialogActions>
+			</Dialog>
+		);
 	}
 
 	// Render

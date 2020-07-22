@@ -10,6 +10,7 @@
 
 // NPM modules
 import React, { useState } from 'react';
+import { Switch, Route } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 
 // Material UI
@@ -36,6 +37,9 @@ import NoUser from './dialogs/NoUser';
 import Dashboard from './tabs/Dashboard';
 import Personal from './tabs/Personal';
 import Prescriptions from './tabs/Prescriptions';
+
+// Verify
+import Verify from './Verify';
 
 // CSS Theme
 import Theme from './Theme'
@@ -130,36 +134,45 @@ export default function Site(props) {
 			<Alerts />
 			<ThemeProvider theme={Theme}>
 				<CssBaseline />
-				<div className={classes.site}>
-					{user === false &&
-						<NoUser />
-					}
-					<Header
-						user={user}
-					/>
-					<AppBar position="static" color="default" className={classes.tabs}>
-						<Tabs
-							onChange={(ev, newTab) => tabSet(newTab)}
-							value={tab}
-							variant="fullWidth"
-						>
-							<Tab label="Dashboard" />
-							<Tab label="Personal" />
-							<Tab label="Prescriptions" />
-						</Tabs>
-					</AppBar>
-					<div className={classes.content}>
-						{tab === 0 &&
-							<Dashboard user={user} />
-						}
-						{tab === 1 &&
-							<Personal user={user} />
-						}
-						{tab === 2 &&
-							<Prescriptions user={user} />
-						}
+				<Switch>
+					<div className={classes.site}>
+						<Header
+							user={user}
+						/>
+						<Route path="/">
+							{user === false &&
+								<NoUser />
+							}
+							<AppBar position="static" color="default" className={classes.tabs}>
+								<Tabs
+									onChange={(ev, newTab) => tabSet(newTab)}
+									value={tab}
+									variant="fullWidth"
+								>
+									<Tab label="Dashboard" />
+									<Tab label="Personal" />
+									<Tab label="Prescriptions" />
+								</Tabs>
+							</AppBar>
+							<div className={classes.content}>
+								{tab === 0 &&
+									<Dashboard user={user} />
+								}
+								{tab === 1 &&
+									<Personal user={user} />
+								}
+								{tab === 2 &&
+									<Prescriptions user={user} />
+								}
+							</div>
+						</Route>
+						<Route path="/verify">
+							<div className={classes.content}>
+								<Verify />
+							</div>
+						</Route>
 					</div>
-				</div>
+				</Switch>
 			</ThemeProvider>
 		</SnackbarProvider>
 	);

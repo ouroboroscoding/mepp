@@ -36,6 +36,9 @@ import SaveIcon from '@material-ui/icons/Save';
 // Composite components
 import Address from '../composites/Address';
 
+// Shared functions
+import supportRequest from '../functions/supportRequest';
+
 // Generic modules
 import Events from '../../generic/events';
 import Rest from '../../generic/rest';
@@ -119,7 +122,8 @@ export default function Personal(props) {
 
 		// Fetch all info
 		Rest.update('patient', 'account/email', {
-			email: email
+			email: email,
+			url: 'https://' + process.env.REACT_APP_SELF_DOMAIN + '/verify#key='
 		}).done(res => {
 
 			// If there's an error
@@ -166,35 +170,6 @@ export default function Personal(props) {
 
 				// Set the info
 				infoSet(res.data);
-			}
-		});
-	}
-
-	function supportRequest(type) {
-
-		// Send request to service
-		Rest.create('patient', 'support_request', {
-			type: type
-		}).done(res => {
-
-			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
-				Events.trigger('error', JSON.stringify(res.error));
-			}
-
-			// If there's a warning
-			if(res.warning) {
-				Events.trigger('warning', JSON.stringify(res.warning));
-			}
-
-			// If there's data
-			if(res.data) {
-
-				// Notify success
-				Events.trigger('success', 'A support agent will contact you as soon as possible');
-
-				// Hide the dialog
-				paymentSet(false);
 			}
 		});
 	}
@@ -424,7 +399,7 @@ export default function Personal(props) {
 						</DialogContent>
 						<DialogActions>
 							<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
-							<Button variant="contained" color="primary" data-support="payment" onClick={ev => supportRequest('payment')}>Have Support Contact You</Button>
+							<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
 						</DialogActions>
 					</Dialog>
 				}
