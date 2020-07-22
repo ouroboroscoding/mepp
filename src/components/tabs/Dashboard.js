@@ -17,6 +17,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles';
 
 // Generic modules
@@ -40,6 +41,9 @@ const useStyles = makeStyles((theme) => ({
 	},
 	paper: {
 		marginBottom: '15px'
+	},
+	title: {
+		marginBottom: '10px'
 	}
 }));
 
@@ -154,10 +158,16 @@ export default function Dashboard(props) {
 	// Render elements
 	let lRender = []
 
+	if(purchases !== null && purchases.length > 0) {
+		lRender.push(
+			<Box key={'r' + lRender.length}>
+				<Typography className={classes.title} variant="h3">{purchases[0].shipping.lastName}, {purchases[0].shipping.firstName}</Typography>
+			</Box>
+		);
+	}
+
 	// If we are loading
-	if(tracking === null) {
-		lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
-	} else {
+	if(tracking !== null) {
 		lRender.push(
 			<Paper key={'r' + lRender.length} className={classes.paper}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
@@ -181,10 +191,10 @@ export default function Dashboard(props) {
 			<Paper className={classes.paper} key={i}>
 				<Grid className={classes.grid} container justify="center" spacing={2}>
 					<Grid item xs={12}><strong>{o.product}</strong></Grid>
-					<Grid item xs={4}>Last Billed Date</Grid>
+					<Grid item xs={4}>Last Charged Date</Grid>
 					<Grid item xs={4}>{o.latest ? Utils.niceDate(o.latest.date) : 'No Order found'}</Grid>
 					<Grid item xs={4}>{o.latest ? ('$' + o.latest.price.toFixed(2)) : ''}</Grid>
-					<Grid item xs={4}>Next Refill Billed</Grid>
+					<Grid item xs={4}>Next Charged Date</Grid>
 					<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
 					<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
 				</Grid>

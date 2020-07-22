@@ -289,6 +289,8 @@ export default function Personal(props) {
 					Events.trigger('error', 'Can not connect to USPS to verify address.');
 				} else if(res.error.code === 1701) {
 					Events.trigger('error', 'No such address in the USPS database. Please verify you have entered the information correctly.');
+				} else if(res.error.code === 1701) {
+					Events.trigger('error', 'No such city in the USPS database. Please verify you have entered the information correctly.');
 				} else {
 					Events.trigger('error', JSON.stringify(res.error));
 				}
