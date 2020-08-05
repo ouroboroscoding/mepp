@@ -1,4 +1,12 @@
-
+/**
+ * Support Request
+ *
+ * Notifies support the patient wishes to be contacted
+ *
+ * @author Chris Nasr <bast@maleexcel.com>
+ * @copyright MaleExcelMedical
+ * @created 2020-07-22
+ */
 
 // Generic modules
 import Events from '../../generic/events';
@@ -12,7 +20,8 @@ import Utils from '../../utils';
  *
  * Notifies support the patient wishes to be contacted
  *
- * @name suppoerRequest
+ * @name supportRequest
+ * @access public
  * @param String type The type of support request
  * @param Function success The function to call upon success
  * @return void

@@ -300,110 +300,118 @@ export default function Personal(props) {
 		});
 	}
 
-	// If we are loading
-	if(info === null) {
-		return <Box className={classes.box}>Loading...</Box>;
-	} else {
-		return (
-			<Box className={classes.box}>
-				<Table className={classes.table}>
-					<TableBody>
-						<TableRow>
-							<TableCell className="descr">Phone Number</TableCell>
-							<TableCell className="content">{phone ?
-								<TextField name="phone" onChange={ev => phoneSet(ev.currentTarget.value)} type="text" value={phone} /> :
-								Utils.nicePhone(info.phone)
-							}</TableCell>
-							<TableCell className="edit">
-								<Tooltip title={(phone ? 'Save' : 'Edit') + ' Phone Number'}><IconButton onClick={togglePhone}>{phone ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="descr">E-Mail Address</TableCell>
-							<TableCell className="content">{email ?
-								<TextField name="email" onChange={ev => emailSet(ev.currentTarget.value)} type="text" value={email} /> :
-								info.email
-							}</TableCell>
-							<TableCell className="edit">
-								<Tooltip title={(email ? 'Save' : 'Edit') + ' E-mail Address'}><IconButton onClick={toggleEmail}>{email ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="descr">Payment</TableCell>
-							<TableCell className="content">
-								<p>{info.pay.type}</p>
-								<p>**** **** **** {info.pay.last4}</p>
-								<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
-							</TableCell>
-							<TableCell className="edit">
-								<Tooltip title="Edit Payment Info"><IconButton onClick={togglePayment}><EditIcon /></IconButton></Tooltip>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="descr">Billing Address</TableCell>
-							<TableCell className="content">{billing ?
-								<Address name="billing" onChange={ev => billingSet(ev.currentTarget.value)} value={billing} /> :
-								<React.Fragment>
-									<p>{info.billing.firstName} {info.billing.lastName}</p>
-									{info.billing.company &&
-										<p>{info.billing.company}</p>
-									}
-									<p>{info.billing.address1 + (info.billing.address2 ? (', ' + info.billing.address2) : '')}</p>
-									<p>{info.billing.city}, {info.billing.state}</p>
-									<p>{info.billing.postalCode}</p>
-								</React.Fragment>
-							}</TableCell>
-							<TableCell className="edit">
-								<Tooltip title={(billing ? 'Save' : 'Edit') + ' Billing Address'}><IconButton onClick={toggleBilling}>{billing ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell className="descr">Shipping Address</TableCell>
-							<TableCell className="content">{shipping ?
-								<Box>
-									<Address name="shipping" onChange={ev => shippingSet(ev.currentTarget.value)} value={shipping} />
-									<FormControlLabel
-										control={<Checkbox color="primary" checked={urgent} onChange={ev => urgentSet(ev.currentTarget.checked)} inputRef={urgentRef} />}
-										label="Check this box if this address change is urgent for an order that's been billed but not shipped yet"
-									/>
-								</Box> :
-								<React.Fragment>
-									<p>{info.shipping.firstName} {info.shipping.lastName}</p>
-									{info.shipping.company &&
-										<p>{info.shipping.company}</p>
-									}
-									<p>{info.shipping.address1 + (info.shipping.address2 ? (', ' + info.shipping.address2) : '')}</p>
-									<p>{info.shipping.city}, {info.shipping.state}</p>
-									<p>{info.shipping.postalCode}</p>
-								</React.Fragment>
-							}</TableCell>
-							<TableCell className="edit">
-								<Tooltip title={(shipping ? 'Save' : 'Edit') + ' Shipping Address'}><IconButton onClick={toggleShipping}>{shipping ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
-							</TableCell>
-						</TableRow>
-					</TableBody>
-				</Table>
-				{payment &&
-					<Dialog
-						onClose={togglePayment}
-						fullWidth={true}
-						maxWidth="sm"
-						open={true}
-					>
-						<DialogTitle>Payment</DialogTitle>
-						<DialogContent dividers>
-							<p>Please note we do not allow changing payment
-							information via the patient portal. Please contact
-							support or click the button below to have a support
-							agent contact you as soon as one is available.</p>
-						</DialogContent>
-						<DialogActions>
-							<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
-							<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
-						</DialogActions>
-					</Dialog>
-				}
-			</Box>
-		);
+	// If we have a user
+	if(props.user) {
+
+		// If we are loading
+		if(info === null) {
+			return <Box className={classes.box}>Loading...</Box>;
+		} else {
+			return (
+				<Box className={classes.box}>
+					<Table className={classes.table}>
+						<TableBody>
+							<TableRow>
+								<TableCell className="descr">Phone Number</TableCell>
+								<TableCell className="content">{phone ?
+									<TextField name="phone" onChange={ev => phoneSet(ev.currentTarget.value)} type="text" value={phone} /> :
+									Utils.nicePhone(info.phone)
+								}</TableCell>
+								<TableCell className="edit">
+									<Tooltip title={(phone ? 'Save' : 'Edit') + ' Phone Number'}><IconButton onClick={togglePhone}>{phone ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell className="descr">E-Mail Address</TableCell>
+								<TableCell className="content">{email ?
+									<TextField name="email" onChange={ev => emailSet(ev.currentTarget.value)} type="text" value={email} /> :
+									info.email
+								}</TableCell>
+								<TableCell className="edit">
+									<Tooltip title={(email ? 'Save' : 'Edit') + ' E-mail Address'}><IconButton onClick={toggleEmail}>{email ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell className="descr">Payment</TableCell>
+								<TableCell className="content">
+									<p>{info.pay.type}</p>
+									<p>**** **** **** {info.pay.last4}</p>
+									<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
+								</TableCell>
+								<TableCell className="edit">
+									<Tooltip title="Edit Payment Info"><IconButton onClick={togglePayment}><EditIcon /></IconButton></Tooltip>
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell className="descr">Billing Address</TableCell>
+								<TableCell className="content">{billing ?
+									<Address name="billing" onChange={ev => billingSet(ev.currentTarget.value)} value={billing} /> :
+									<React.Fragment>
+										<p>{info.billing.firstName} {info.billing.lastName}</p>
+										{info.billing.company &&
+											<p>{info.billing.company}</p>
+										}
+										<p>{info.billing.address1 + (info.billing.address2 ? (', ' + info.billing.address2) : '')}</p>
+										<p>{info.billing.city}, {info.billing.state}</p>
+										<p>{info.billing.postalCode}</p>
+									</React.Fragment>
+								}</TableCell>
+								<TableCell className="edit">
+									<Tooltip title={(billing ? 'Save' : 'Edit') + ' Billing Address'}><IconButton onClick={toggleBilling}>{billing ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell className="descr">Shipping Address</TableCell>
+								<TableCell className="content">{shipping ?
+									<Box>
+										<Address name="shipping" onChange={ev => shippingSet(ev.currentTarget.value)} value={shipping} />
+										<FormControlLabel
+											control={<Checkbox color="primary" checked={urgent} onChange={ev => urgentSet(ev.currentTarget.checked)} inputRef={urgentRef} />}
+											label="Check this box if this address change is urgent for an order that's been billed but not shipped yet"
+										/>
+									</Box> :
+									<React.Fragment>
+										<p>{info.shipping.firstName} {info.shipping.lastName}</p>
+										{info.shipping.company &&
+											<p>{info.shipping.company}</p>
+										}
+										<p>{info.shipping.address1 + (info.shipping.address2 ? (', ' + info.shipping.address2) : '')}</p>
+										<p>{info.shipping.city}, {info.shipping.state}</p>
+										<p>{info.shipping.postalCode}</p>
+									</React.Fragment>
+								}</TableCell>
+								<TableCell className="edit">
+									<Tooltip title={(shipping ? 'Save' : 'Edit') + ' Shipping Address'}><IconButton onClick={toggleShipping}>{shipping ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+								</TableCell>
+							</TableRow>
+						</TableBody>
+					</Table>
+					{payment &&
+						<Dialog
+							onClose={togglePayment}
+							fullWidth={true}
+							maxWidth="sm"
+							open={true}
+						>
+							<DialogTitle>Payment</DialogTitle>
+							<DialogContent dividers>
+								<p>Please note we do not allow changing payment
+								information via the patient portal. Please contact
+								support or click the button below to have a support
+								agent contact you as soon as one is available.</p>
+							</DialogContent>
+							<DialogActions>
+								<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
+								<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
+							</DialogActions>
+						</Dialog>
+					}
+				</Box>
+			);
+		}
+	}
+	// No user
+	else {
+		return <React.Fragment />
 	}
 }

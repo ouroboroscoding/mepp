@@ -95,7 +95,12 @@ export default function Prescriptions(props) {
 	function filterRx(rx) {
 
 		// If the status is invalid
-		if(rx.Status > 5 && rx.Status < 9) {
+		if([6,7,8].indexOf(rx.Status) > -1) {
+			return false;
+		}
+
+		// If the medication status is invalid
+		if([2,3,4].indexOf(rx.MedicationStatus) > -1) {
 			return false;
 		}
 
@@ -109,31 +114,36 @@ export default function Prescriptions(props) {
 		return true;
 	}
 
-	// If we are loading
-	if(records === null) {
-		return <Box className={classes.box}>Loading...</Box>;
-	} else if(records.length === 0) {
-		return <Box className={classes.box}>No active prescriptions found</Box>
+	// If we have a user
+	if(props.user) {
+
+		// If we are loading
+		if(records === null) {
+			return <Box className={classes.box}>Loading...</Box>;
+		} else {
+			return (
+				<Box className={classes.box}>
+					{records.length === 0 ?
+						<Paper className={classes.rx}>No active prescriptions found</Paper> :
+						records.map((o,i) =>
+							<Paper key={i} className={classes.rx}>
+								<p><strong>Pharmacy: </strong><span>{o.PharmacyName}</span></p>
+								<p><strong>Prescriber: </strong><span>{o.PrescriberName}</span></p>
+								<p><strong>Product: </strong><span>{o.DisplayName} ({o.Quantity})</span></p>
+								<p><strong>Written: </strong><span>{Utils.niceDate(o.WrittenDate)}</span></p>
+								{o.EffectiveDate &&
+									<p><strong>Effective: </strong><span>{Utils.niceDate(o.EffectiveDate)}</span></p>
+								}
+								<p><strong>Status: </strong><span>{o.StatusText}</span></p>
+								<p><strong>Medication Status: </strong><span>{o.MedicationStatusText}</span></p>
+								<p><strong>Directions: </strong><span>{o.Directions}</span></p>
+							</Paper>
+						)
+					}
+				</Box>
+			);
+		}
 	} else {
-		return (
-			<Box className={classes.box}>
-				{records.map((o,i) => {
-					return (
-						<Paper key={i} className={classes.rx}>
-							<p><strong>Pharmacy: </strong><span>{o.PharmacyName}</span></p>
-							<p><strong>Prescriber: </strong><span>{o.PrescriberName}</span></p>
-							<p><strong>Product: </strong><span>{o.DisplayName} ({o.Quantity})</span></p>
-							<p><strong>Written: </strong><span>{Utils.niceDate(o.WrittenDate)}</span></p>
-							{o.EffectiveDate &&
-								<p><strong>Effective: </strong><span>{Utils.niceDate(o.EffectiveDate)}</span></p>
-							}
-							<p><strong>Status: </strong><span>{o.StatusText}</span></p>
-							<p><strong>Medication Status: </strong><span>{o.MedicationStatusText}</span></p>
-							<p><strong>Directions: </strong><span>{o.Directions}</span></p>
-						</Paper>
-					);
-				})}
-			</Box>
-		);
+		return <React.Fragment />
 	}
 }

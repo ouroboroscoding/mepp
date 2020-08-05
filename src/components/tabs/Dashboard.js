@@ -116,7 +116,7 @@ export default function Dashboard(props) {
 				filterLatest(res.data)
 
 				// Set the purchases
-				purchasesSet(res.data);
+				purchasesSet(res.data.filter(o => o.status === 'ACTIVE'));
 			}
 		});
 	}
@@ -171,85 +171,97 @@ export default function Dashboard(props) {
 		cancelSet(val => !val);
 	}
 
-	// Render elements
-	let lRender = []
+	// If we have a user
+	if(props.user) {
 
-	if(purchases !== null && purchases.length > 0) {
-		lRender.push(
-			<Box key={'r' + lRender.length}>
-				<Typography className={classes.title} variant="h3">{purchases[0].shipping.lastName}, {purchases[0].shipping.firstName}</Typography>
-			</Box>
-		);
-	}
+		// Render elements
+		let lRender = []
 
-	// If we are loading
-	if(tracking !== null) {
-		lRender.push(
-			<Paper key={'r' + lRender.length} className={classes.paper}>
-				<Grid className={classes.grid} container justify="center" spacing={2}>
-					<Grid item xs={12}><strong>Tracking Codes</strong></Grid>
-					{tracking.length === 0 ?
-						<span>No tracking available yet.</span> :
-						tracking.slice(0,3).map((o,i) =>
-							<React.Fragment>
-								<Grid item xs={4}>{Utils.niceDate(o.date + 'T00:00:00')}</Grid>
-								<Grid item xs={8}>{o.type} <Link color="secondary" href={o.link} target="_blank">{o.code}</Link></Grid>
-							</React.Fragment>
-						)
-					}
-				</Grid>
-			</Paper>
-		);
-	}
+		if(purchases !== null && purchases.length > 0) {
+			lRender.push(
+				<Box key={'r' + lRender.length}>
+					<Typography className={classes.title} variant="h3">{purchases[0].shipping.lastName}, {purchases[0].shipping.firstName}</Typography>
+				</Box>
+			);
+		}
 
-	// If we are loading
-	if(purchases === null) {
-		lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
-	} else {
-		lRender.push(...purchases.filter(o => o.status === 'ACTIVE').map((o, i) =>
-			<Paper className={classes.paper} key={i}>
-				<Grid className={classes.grid} container justify="center" spacing={2}>
-					<Grid item xs={12}><strong>{o.product}</strong></Grid>
-					<Grid item xs={4}>Last Charged Date</Grid>
-					<Grid item xs={4}>{o.latest ? Utils.niceDate(o.latest.date) : 'No Order found'}</Grid>
-					<Grid item xs={4}>{o.latest ? ('$' + o.latest.price.toFixed(2)) : ''}</Grid>
-					<Grid item xs={4}>Next Charged Date</Grid>
-					<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
-					<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
-					<Grid className={classes.cancel} item xs={12}>
-						<Button variant="contained" color="primary" onClick={toggleCancel}>Cancel Order</Button>
+		// If we are loading
+		if(tracking !== null) {
+			lRender.push(
+				<Paper key={'r' + lRender.length} className={classes.paper}>
+					<Grid className={classes.grid} container justify="center" spacing={2}>
+						<Grid item xs={12}><strong>Tracking Codes</strong></Grid>
+						{tracking.length === 0 ?
+							<span>No tracking available yet.</span> :
+							tracking.slice(0,3).map((o,i) =>
+								<React.Fragment>
+									<Grid item xs={4}>{Utils.niceDate(o.date + 'T00:00:00')}</Grid>
+									<Grid item xs={8}>{o.type} <Link color="secondary" href={o.link} target="_blank">{o.code}</Link></Grid>
+								</React.Fragment>
+							)
+						}
 					</Grid>
-				</Grid>
-			</Paper>
-		));
-	}
+				</Paper>
+			);
+		}
 
-	// If cancel clicked
-	if(cancel) {
-		lRender.push(
-			<Dialog
-				fullWidth={true}
-				key={'r' + lRender.length}
-				maxWidth="sm"
-				onClose={toggleCancel}
-				open={true}
-			>
-				<DialogTitle>Cancel Order</DialogTitle>
-				<DialogContent dividers>
-					<p>To cancel your order please contact support or click the
-					button below to have a support agent contact you as soon as
-					one is available.</p>
-				</DialogContent>
-				<DialogActions>
-					<Button variant="contained" color="secondary" onClick={toggleCancel}>Cancel</Button>
-					<Button variant="contained" color="primary" onClick={ev => supportRequest('cancel_order', () => cancelSet(false))}>Have Support Contact You</Button>
-				</DialogActions>
-			</Dialog>
+		// If we are loading
+		if(purchases === null) {
+			lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
+		} else {
+			if(purchases.length === 0) {
+				lRender.push(<Paper className={classes.grid} key={'r' + lRender.length}>You have no current purchases</Paper>);
+			} else {
+				lRender.push(...purchases.map((o, i) =>
+					<Paper className={classes.paper} key={i}>
+						<Grid className={classes.grid} container justify="center" spacing={2}>
+							<Grid item xs={12}><strong>{o.product}</strong></Grid>
+							<Grid item xs={4}>Last Charged Date</Grid>
+							<Grid item xs={4}>{o.latest ? Utils.niceDate(o.latest.date) : 'No Order found'}</Grid>
+							<Grid item xs={4}>{o.latest ? ('$' + o.latest.price.toFixed(2)) : ''}</Grid>
+							<Grid item xs={4}>Next Charged Date</Grid>
+							<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
+							<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
+							<Grid className={classes.cancel} item xs={12}>
+								<Button variant="contained" color="primary" onClick={toggleCancel}>Cancel Order</Button>
+							</Grid>
+						</Grid>
+					</Paper>
+				));
+			}
+		}
+
+		// If cancel clicked
+		if(cancel) {
+			lRender.push(
+				<Dialog
+					fullWidth={true}
+					key={'r' + lRender.length}
+					maxWidth="sm"
+					onClose={toggleCancel}
+					open={true}
+				>
+					<DialogTitle>Cancel Order</DialogTitle>
+					<DialogContent dividers>
+						<p>To cancel your order please contact support or click the
+						button below to have a support agent contact you as soon as
+						one is available.</p>
+					</DialogContent>
+					<DialogActions>
+						<Button variant="contained" color="secondary" onClick={toggleCancel}>Cancel</Button>
+						<Button variant="contained" color="primary" onClick={ev => supportRequest('cancel_order', () => cancelSet(false))}>Have Support Contact You</Button>
+					</DialogActions>
+				</Dialog>
+			);
+		}
+
+		// Render
+		return (
+			<Box className={classes.box}>{lRender}</Box>
 		);
 	}
-
-	// Render
-	return (
-		<Box className={classes.box}>{lRender}</Box>
-	);
+	// No user
+	else {
+		return <React.Fragment />
+	}
 }
