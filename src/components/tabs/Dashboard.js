@@ -116,7 +116,7 @@ export default function Dashboard(props) {
 				filterLatest(res.data)
 
 				// Set the purchases
-				purchasesSet(res.data.filter(o => o.status === 'ACTIVE'));
+				purchasesSet(res.data.filter(o => o.status in ['ACTIVE','TRIAL']));
 			}
 		});
 	}
