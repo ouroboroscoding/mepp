@@ -134,45 +134,50 @@ export default function Site(props) {
 			<Alerts />
 			<ThemeProvider theme={Theme}>
 				<CssBaseline />
-				<Switch>
-					<div className={classes.site}>
-						<Header
-							user={user}
-						/>
+				<div className={classes.site}>
+					<Header
+						user={user}
+					/>
+					<Switch>
 						<Route path="/">
-							{user === false &&
+							{user ?
+								<React.Fragment>
+									<AppBar position="static" color="default" className={classes.tabs}>
+										<Tabs
+											onChange={(ev, newTab) => tabSet(newTab)}
+											value={tab}
+											variant="fullWidth"
+										>
+											<Tab label="Dashboard" />
+											<Tab label="Personal" />
+											{user.rx_id &&
+												<Tab label="Prescriptions" />
+											}
+										</Tabs>
+									</AppBar>
+									<div className={classes.content}>
+										{tab === 0 &&
+											<Dashboard user={user} />
+										}
+										{tab === 1 &&
+											<Personal user={user} />
+										}
+										{tab === 2 &&
+											<Prescriptions user={user} />
+										}
+									</div>
+								</React.Fragment>
+							:
 								<NoUser />
 							}
-							<AppBar position="static" color="default" className={classes.tabs}>
-								<Tabs
-									onChange={(ev, newTab) => tabSet(newTab)}
-									value={tab}
-									variant="fullWidth"
-								>
-									<Tab label="Dashboard" />
-									<Tab label="Personal" />
-									<Tab label="Prescriptions" />
-								</Tabs>
-							</AppBar>
-							<div className={classes.content}>
-								{tab === 0 &&
-									<Dashboard user={user} />
-								}
-								{tab === 1 &&
-									<Personal user={user} />
-								}
-								{tab === 2 &&
-									<Prescriptions user={user} />
-								}
-							</div>
 						</Route>
 						<Route path="/verify">
 							<div className={classes.content}>
 								<Verify />
 							</div>
 						</Route>
-					</div>
-				</Switch>
+					</Switch>
+				</div>
 			</ThemeProvider>
 		</SnackbarProvider>
 	);
