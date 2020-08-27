@@ -82,7 +82,7 @@ export default function Setup(props) {
 			"lname": lnameRef.current.value,
 			"dob": dobRef.current.value,
 			"passwd": passRef.current.value
-		}).done(res => {
+		}, false).done(res => {
 
 			// If there's an error
 			if(res.error && !Utils.restError(res.error)) {

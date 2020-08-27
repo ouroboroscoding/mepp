@@ -93,7 +93,7 @@ export default function Signin(props) {
 		Rest.create('patient', 'signin', {
 			"email": emailRef.current.value,
 			"passwd": passRef.current.value
-		}).done(res => {
+		}, false).done(res => {
 
 			// If there's an error
 			if(res.error && !Utils.restError(res.error)) {
