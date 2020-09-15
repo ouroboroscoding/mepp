@@ -210,7 +210,7 @@ export default function Dashboard(props) {
 			lRender.push(<Box key={'r' + lRender.length}>Loading...</Box>);
 		} else {
 			if(purchases.length === 0) {
-				lRender.push(<Paper className={classes.grid} key={'r' + lRender.length}>You have no current purchases</Paper>);
+				lRender.push(<Paper className={classes.grid} key={'r' + lRender.length}>You have no subscriptions</Paper>);
 			} else {
 				lRender.push(...purchases.map((o, i) =>
 					<Paper className={classes.paper} key={i}>
