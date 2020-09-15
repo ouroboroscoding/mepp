@@ -223,7 +223,7 @@ export default function Dashboard(props) {
 							<Grid item xs={4}>{o.nextBillDate ? Utils.niceDate(o.nextBillDate + 'T00:00:00') : 'No Future Refills'}</Grid>
 							<Grid item xs={4}>{o.nextBillDate ? ('$' + o.price) : ''}</Grid>
 							<Grid className={classes.cancel} item xs={12}>
-								<Button variant="contained" color="primary" onClick={toggleCancel}>Cancel Order</Button>
+								<Button variant="contained" color="primary" onClick={toggleCancel}>Pause Subscription</Button>
 							</Grid>
 						</Grid>
 					</Paper>
@@ -241,11 +241,11 @@ export default function Dashboard(props) {
 					onClose={toggleCancel}
 					open={true}
 				>
-					<DialogTitle>Cancel Order</DialogTitle>
+					<DialogTitle>Pause Subscription</DialogTitle>
 					<DialogContent dividers>
-						<p>To cancel your order please contact support or click the
-						button below to have a support agent contact you as soon as
-						one is available.</p>
+						<p>To pause your subscription please contact support or
+						click the button below to have a support agent contact
+						you as soon as one is available.</p>
 					</DialogContent>
 					<DialogActions>
 						<Button variant="contained" color="secondary" onClick={toggleCancel}>Cancel</Button>
