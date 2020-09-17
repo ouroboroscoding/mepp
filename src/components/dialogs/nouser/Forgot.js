@@ -89,7 +89,7 @@ export default function Forgot(props) {
 			}
 
 			// If there's data
-			if(res.data) {
+			if('data' in res) {
 
 				// Notify success
 				Events.trigger('success', 'Thank you, if the e-mail is valid in our system, you will received a link to change your password.');
