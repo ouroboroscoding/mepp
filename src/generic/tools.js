@@ -89,6 +89,50 @@ export function clone(o) {
 }
 
 /**
+ * Combine
+ *
+ * Merges data from the second parameter onto the first and returns a new object
+ *
+ * @name combine
+ * @access public
+ * @param Object o1 The object which will be overwritten by values in o2
+ * @param Object o2 The object which will overwrite values in o1
+ * @return Object
+ */
+export function combine(o1, o2) {
+
+	// Make sure both arguments are actual dicts
+	if(typeof o1 !== 'object') {
+		throw new Error('o1 is not a valid Object');
+	}
+	if(typeof o2 !== 'object') {
+		throw new Error('o2 is not a valid Object');
+	}
+
+	// Init the return based on o1
+	let oRet = clone(o1);
+
+	// Get each key of the second dict
+	for(let k in o2) {
+
+		// If the value is another dict and it exists in first as well
+		if(typeof o2[k] === 'object' && k in oRet && typeof oRet[k] === 'object') {
+
+			// Call combine
+			oRet[k] = combine(oRet[k], o2[k]);
+		}
+
+		// else we overwrite the value as is
+		else {
+			oRet[k] = o2[k];
+		}
+	}
+
+	// Return the new object
+	return oRet;
+}
+
+/**
  * Compare
  *
  * Compares two values of any type to see if they contain the same
@@ -281,6 +325,59 @@ export function safeLocalStorage(name, default_) {
 }
 
 /**
+ * Safe Local Storage Bool
+ *
+ * Fetches a value from local storage or returns the default if no value is
+ * found. Assumes data is a boolean value
+ *
+ * @name safeLocalStorageBool
+ * @param String name			The name of the local var to fetch
+ * @param String default_		The value to return if the var is not found
+ * @return bool
+ */
+export function safeLocalStorageBool(name, default_=false) {
+	let value = localStorage.getItem(name);
+	return value === null ? default_ : (
+		value === '' ? false : true
+	)
+}
+
+/**
+ * Safe Local Storage JSON
+ *
+ * Fetches a value from local storage or returns the default if no value is
+ * found. Assumes data is stored in JSON
+ *
+ * safeLocalStorageJSON
+ * @access public
+ * @param String name			The name of the local var to fetch
+ * @param String default_		The value to return if the var is not found
+ * @return String
+ */
+export function safeLocalStorageJSON(name, default_) {
+	let value = localStorage.getItem(name);
+	return value === null ? default_ : JSON.parse(value);
+}
+
+/**
+ * Sort By Key
+ *
+ * Returns a callback function that will compare two objects by the key name
+ * pass
+ *
+ * @name sortByKey
+ * @access public
+ * @param string key The name of the key to sort by
+ * @return Function
+ */
+export function sortByKey(key) {
+	return (a, b) => {
+		if(a[key] === b[key]) return 0;
+		else return (a[key] < b[key]) ? -1 : 1;
+	}
+}
+
+/**
  * UCFirst
  *
  * Makes the first character of each word in the text upper case
@@ -308,8 +405,9 @@ export function ucfirst(text) {
  */
 export function uuidv4() {
 	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-		(c ^ crypto.getRandomValues((new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
-	)
+		// eslint-disable-next-line
+		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+	);
 }
 
 // export module
@@ -324,6 +422,10 @@ export default {
 	isInteger: isInteger,
 	isObject: isObject,
 	omap: omap,
+	safeLocalStorage: safeLocalStorage,
+	safeLocalStorageBool: safeLocalStorageBool,
+	safeLocalStorageJSON: safeLocalStorageJSON,
+	sortByKey: sortByKey,
 	ucfirst: ucfirst,
 	uuidv4: uuidv4
 }
