@@ -121,6 +121,10 @@ export default function Setup(props) {
 						Events.trigger('error', 'One or more values do not match what we have on file. Please try again.');
 						errorsSet({"lname": "Possibly Invalid", "dob": "Possibly Invalid"});
 						break;
+					case 1911:
+						Events.trigger('error', 'Your account is already setup, please sign in with your email and password.');
+						Hash.set('key', null);
+						break;
 					default:
 						Events.trigger('error', JSON.stringify(res.error));
 						break;
