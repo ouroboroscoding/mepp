@@ -244,12 +244,13 @@ export default function Dashboard(props) {
 					<DialogTitle>Pause Subscription</DialogTitle>
 					<DialogContent dividers>
 						<p>To pause your subscription please contact support or
-						click the button below to have a support agent contact
-						you as soon as one is available.</p>
+						click the button below to be added to our support queue
+						and an agent will contact you as soon as your request is
+						completed.</p>
 					</DialogContent>
 					<DialogActions>
 						<Button variant="contained" color="secondary" onClick={toggleCancel}>Cancel</Button>
-						<Button variant="contained" color="primary" onClick={ev => supportRequest('cancel_order', () => cancelSet(false))}>Have Support Contact You</Button>
+						<Button variant="contained" color="primary" onClick={ev => supportRequest('cancel_order', () => cancelSet(false))}>Request Pause</Button>
 					</DialogActions>
 				</Dialog>
 			);
