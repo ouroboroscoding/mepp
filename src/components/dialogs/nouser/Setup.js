@@ -107,7 +107,7 @@ export default function Setup(props) {
 						forgotSet(true);
 						break;
 					case 1904:
-						Events.trigger('error', 'Password must contain at least one uppercase, lowercase, and numeric character');
+						Events.trigger('error', 'Password must be at least 8 characters and contain one uppercase, one lowercase, and one numeric character');
 						errorsSet({"passwd": 'Weak Password'});
 						break;
 					case 1905:
