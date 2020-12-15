@@ -215,7 +215,7 @@ export default function Dashboard(props) {
 				lRender.push(...purchases.map((o, i) =>
 					<Paper className={classes.paper} key={i}>
 						<Grid className={classes.grid} container justify="center" spacing={2}>
-							<Grid item xs={12}><strong>{o.product}</strong></Grid>
+							<Grid item xs={12}><strong>{o.product.name}</strong></Grid>
 							<Grid item xs={4}>Last Charged Date</Grid>
 							<Grid item xs={4}>{o.latest ? Utils.niceDate(o.latest.date.replace(' ', 'T')) : 'No Order found'}</Grid>
 							<Grid item xs={4}>{o.latest ? ('$' + o.latest.price.toFixed(2)) : ''}</Grid>
