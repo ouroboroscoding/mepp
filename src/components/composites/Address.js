@@ -20,8 +20,8 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-// Generic modules
-import Tools from '../../generic/tools';
+// Shared generic modules
+import { clone } from 'shared/generic/tools';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +50,7 @@ export default function Address(props) {
 
 	// Capture changes
 	function change(ev) {
-		let newValue = Tools.clone(props.value);
+		let newValue = clone(props.value);
 		newValue[ev.currentTarget.name] = ev.currentTarget.value;
 		props.onChange({
 			currentTarget: {

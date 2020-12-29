@@ -16,13 +16,12 @@ import { useHistory } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 
-// Generic modules
-import Events from '../generic/events';
-import Hash from '../generic/hash';
-import Rest from '../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
 
-// Local modules
-import Utils from '../utils';
+// Shared generic modules
+import Events from 'shared/generic/events';
+import Hash from 'shared/generic/hash';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -61,7 +60,7 @@ export default function Verify(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				if(res.error.code === 1903) {
 					Events.trigger('error', 'Key or account invalid');
 				} else {

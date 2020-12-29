@@ -20,13 +20,15 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
-// Generic modules
-import Events from '../generic/events';
-import Hash from '../generic/hash';
-import Rest from '../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
+import Hash from 'shared/generic/hash';
 
 // Hooks
-import useEvent from '../hooks/event';
+import { useEvent } from 'shared/hooks/event';
 
 // Composite component modules
 import Alerts from './composites/Alerts';
@@ -48,7 +50,7 @@ import Theme from './Theme'
 import { LoaderHide, LoaderShow } from './composites/Loader';
 
 // Init the rest services
-Rest.init(process.env.REACT_APP_MEMS_DOMAIN, xhr => {
+Rest.init(process.env.REACT_APP_MEMS_DOMAIN, process.env.REACT_APP_MEMS_DOMAIN, xhr => {
 
 	// If we got a 401, let everyone know we signed out
 	if(xhr.status === 401) {

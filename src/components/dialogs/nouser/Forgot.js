@@ -20,13 +20,12 @@ import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-// Generic modules
-import Events from '../../../generic/events';
-import Hash from '../../../generic/hash';
-import Rest from '../../../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
 
-// Local modules
-import Utils from '../../../utils';
+// Shared generic modules
+import Events from 'shared/generic/events';
+import Hash from 'shared/generic/hash';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -64,10 +63,10 @@ export default function Forgot(props) {
 		Rest.create('patient', 'account/forgot', {
 			"email": emailRef.current.value,
 			"url": 'https://' + process.env.REACT_APP_SELF_DOMAIN + '/#key=c'
-		}, false).done(res => {
+		}, {session: false}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				switch(res.error.code) {
 					case 1001:
 						// Go through each message and mark the error

@@ -24,12 +24,14 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 // Local components
 import Loader from './Loader';
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
 
 // Local modules
-import Utils from '../../utils';
+import Utils from 'utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({

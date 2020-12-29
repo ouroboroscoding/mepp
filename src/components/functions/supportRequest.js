@@ -8,12 +8,11 @@
  * @created 2020-07-22
  */
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
 
-// Local modules
-import Utils from '../../utils';
+// Shared generic modules
+import Events from 'shared/generic/events';
 
 /**
  * Support Request
@@ -34,7 +33,7 @@ export default function supportRequest(type, success=null) {
 	}).done(res => {
 
 		// If there's an error
-		if(res.error && !Utils.restError(res.error)) {
+		if(res.error && !res._handled) {
 			Events.trigger('error', JSON.stringify(res.error));
 		}
 

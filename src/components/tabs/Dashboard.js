@@ -26,14 +26,16 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles';
 
 // Shared functions
-import supportRequest from '../functions/supportRequest';
+import supportRequest from 'components/functions/supportRequest';
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
 
 // Local modules
-import Utils from '../../utils';
+import Utils from 'utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -100,7 +102,7 @@ export default function Dashboard(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				Events.trigger('error', JSON.stringify(res.error));
 			}
 
@@ -130,7 +132,7 @@ export default function Dashboard(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				Events.trigger('error', JSON.stringify(res.error));
 			}
 
