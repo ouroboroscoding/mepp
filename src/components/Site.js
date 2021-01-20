@@ -10,14 +10,11 @@
 
 // NPM modules
 import React, { useState } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Route, Switch, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 
 // Material UI
-import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline'
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
 // Shared communication modules
@@ -31,20 +28,18 @@ import Hash from 'shared/generic/hash';
 import { useEvent } from 'shared/hooks/event';
 
 // Composite component modules
-import Alerts from './composites/Alerts';
-import Header from './composites/Header';
-import NoUser from './dialogs/NoUser';
+import Alerts from 'components/composites/Alerts';
+import Header from 'components/composites/Header';
 
-// Tab component modules
-import Dashboard from './tabs/Dashboard';
-import Personal from './tabs/Personal';
-import Prescriptions from './tabs/Prescriptions';
+// Pages
+import Main from 'components/pages/Main';
+import CalendlySingle from 'components/pages/CalendlySingle';
 
 // Verify
-import Verify from './Verify';
+import Verify from 'components/Verify';
 
 // CSS Theme
-import Theme from './Theme'
+import Theme from 'components/Theme'
 
 // Local modules
 import { LoaderHide, LoaderShow } from './composites/Loader';
@@ -89,22 +84,10 @@ Hash.init();
 
 // Theme
 const useStyles = makeStyles((theme) => ({
-	content: {
-		flexBasis: 0,
-		flexGrow: 1,
-		flexShrink: 1,
-		height: '100%',
-		overflow: 'auto',
-		padding: '10px'
-	},
 	site: {
 		display: 'flex',
 		flexDirection: 'column',
 		height: '100%'
-	},
-	tabs: {
-		flexGrow: 0,
-		flexShrink: 0
 	}
 }));
 
@@ -123,10 +106,10 @@ export default function Site(props) {
 	const classes = useStyles();
 
 	// State
-	let [tab, tabSet] = useState(0);
 	let [user, userSet] = useState(false);
 
 	// hooks
+	let location = useLocation();
 	useEvent('signedIn', user => userSet(user));
 	useEvent('signedOut', () => userSet(false));
 
@@ -141,39 +124,25 @@ export default function Site(props) {
 						user={user}
 					/>
 					<Switch>
-						<Route path="/">
-							{user ?
-								<React.Fragment>
-									<AppBar position="static" color="default" className={classes.tabs}>
-										<Tabs
-											onChange={(ev, newTab) => tabSet(newTab)}
-											value={tab}
-											variant="fullWidth"
-										>
-											<Tab label="Dashboard" />
-											<Tab label="Personal" />
-											{user.rx_id &&
-												<Tab label="Prescriptions" />
-											}
-										</Tabs>
-									</AppBar>
-									<div className={classes.content}>
-										{tab === 0 &&
-											<Dashboard user={user} />
-										}
-										{tab === 1 &&
-											<Personal user={user} />
-										}
-										{tab === 2 &&
-											<Prescriptions user={user} />
-										}
-									</div>
-								</React.Fragment>
-							:
-								<NoUser />
-							}
+						<Route
+							exact
+							path="/"
+						>
+							<Main user={user} />
 						</Route>
-						<Route path="/verify">
+						<Route
+							exact
+							path="/appointment/:_key"
+							children={
+								<CalendlySingle
+									key={location.pathname}
+								/>
+							}
+						/>
+						<Route
+							exact
+							path="/verify"
+						>
 							<div className={classes.content}>
 								<Verify />
 							</div>
