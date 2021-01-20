@@ -57,9 +57,10 @@ export default function CalendlySingle(props) {
 
 	// Component did mount effect
 	useEffect(() => {
+		eventSet(1);
 		Rest.read('providers', 'calendly/single', {
 			_key: _key
-		}, {sesson: false}).done(res => {
+		}, {session: false}).done(res => {
 			if(res.error && !res._handled) {
 				if(res.error.code === 1104) {
 					eventSet(-1);
