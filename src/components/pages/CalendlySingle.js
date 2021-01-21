@@ -11,10 +11,12 @@
 
 // NPM modules
 import React, { useEffect, useState } from 'react';
+import { InlineWidget } from 'react-calendly';
 import { useParams } from 'react-router-dom';
 
 // Material UI
 import Box from '@material-ui/core/Box';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -23,6 +25,7 @@ import Rest from 'shared/communication/rest';
 
 // Shared generic modules
 import Events from 'shared/generic/events';
+import { isObject } from 'shared/generic/tools';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -30,7 +33,16 @@ const useStyles = makeStyles((theme) => ({
 		flexBasis: 0,
 		flexGrow: 1,
 		flexShrink: 1,
-		padding: '10px'
+		padding: '10px',
+		textAlign: 'center'
+	},
+	error: {
+		margin: '0 auto',
+		textAlign: 'left',
+		maxWidth: '400px',
+		'& p': {
+			marginBottom: '10px'
+		}
 	}
 }));
 
@@ -47,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CalendlySingle(props) {
 
 	// State
-	const [event, eventSet] = useState(0);
+	const [details, detailsSet] = useState(0);
 
 	// Styles
 	const classes = useStyles();
@@ -57,30 +69,19 @@ export default function CalendlySingle(props) {
 
 	// Component did mount effect
 	useEffect(() => {
-		eventSet(1);
+		detailsSet(1);
 		Rest.read('providers', 'calendly/single', {
 			_key: _key
 		}, {session: false}).done(res => {
 			if(res.error && !res._handled) {
 				if(res.error.code === 1104) {
-					eventSet(-1);
+					detailsSet(-1);
 				} else {
 					Events.trigger('error', JSON.stringify(res.error));
 				}
 			}
 			if(res.data) {
-				eventSet(1);
-				window.Calendly.initInlineWidget({
-					url: 'https://calendly.com/' + res.data.uri + '?hide_gdpr_banner=1&background_color=ffffff&text_color=ffffff&primary_color=aa1f23',
-					prefill: {
-						name: res.data.name,
-						email: res.data.email
-					},
-					utm: {
-						utmCampaign: res.data.crm_id,
-						utmSource: _key
-					}
-				});
+				detailsSet(res.data);
 			}
 		});
 	}, [_key]);
@@ -88,15 +89,40 @@ export default function CalendlySingle(props) {
 	// Render
 	return (
 		<Box className={classes.content}>
-			{event === -1 &&
-				<Typography>Appointment key is invalid or has expired. Please contact support via SMS at +1 (833) 394-7744 or by email at support@maleexcel.com</Typography>
+			{details === -1 &&
+				<Box className={classes.error}>
+					<Typography>
+						Appointment key is invalid or has expired. If you need
+						to reschedule your appointment please contact support by
+					</Typography>
+					<Typography>SMS: <Link color="secondary" href="sms:+18336253392">+1 (833) 625-3392</Link></Typography>
+					<Typography>Phone: <Link color="secondary" href="tel:+18333947744">+1 (833) 394-7744</Link></Typography>
+					<Typography>E-mail: <Link color="secondary" href="mailto:support@maleexcel.com">support@maleexcel.com</Link></Typography>
+				</Box>
 			}
-			{event === 0 &&
+			{details === 0 &&
 				<Typography>Loading...</Typography>
 			}
-			<div className="calendly-inline-widget" style={{minWidth:'320px', height:'580px'}} data-auto-load="false">
-
-			</div>
+			{isObject(details) &&
+				<InlineWidget
+					pageSettings={{
+						backgroundColor: 'ffffff',
+						hideLandingPageDetails: true,
+						primaryColor: 'aa1f23',
+						textColor: '000000'
+					}}
+					prefill={{
+						email: details.email,
+						name: details.name,
+					}}
+					styles={{height: '100%'}}
+					url={'https://calendly.com' + details.uri}
+					utm={{
+						utmCampaign: details.crm_id,
+						utmSource: _key
+					}}
+				/>
+			}
 		</Box>
 	);
 }
