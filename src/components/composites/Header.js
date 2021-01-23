@@ -13,7 +13,9 @@ import React from 'react';
 
 // Material UI
 import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,12 +26,14 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 // Local components
 import Loader from './Loader';
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
 
 // Local modules
-import Utils from '../../utils';
+import Utils from 'utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -62,10 +66,13 @@ const useStyles = makeStyles((theme) => ({
 		[theme.breakpoints.down('sm')]: {
 			fontSize: '10px'
 		},
-		'& img': {
-			width: '240px',
-			[theme.breakpoints.down('sm')]: {
-				width: '180px'
+		'& a': {
+			color: '#ffffff',
+			'& img': {
+				width: '240px',
+				[theme.breakpoints.down('sm')]: {
+					width: '180px'
+				}
 			}
 		}
 	},
@@ -113,13 +120,15 @@ export default function Header(props) {
 	return (
 		<AppBar position="relative" className={classes.appbar}>
 			<Toolbar className={classes.toolbar}>
-				<div className={classes.tag}>
-					<img src="/images/logo.png" alt="MaleExcel Logo" style={{}} />
-					<div>Making Health Care Easy</div>
-				</div>
-				<div className={classes.loader}>
+				<Box className={classes.tag}>
+					<Link href="/">
+						<img src="/images/logo.png" alt="MaleExcel Logo" style={{}} />
+						<Box>Making Health Care Easy</Box>
+					</Link>
+				</Box>
+				<Box className={classes.loader}>
 					<Loader />
-				</div>
+				</Box>
 				{props.user &&
 					<React.Fragment>
 						<Tooltip title="Sign Out">

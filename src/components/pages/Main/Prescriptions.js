@@ -16,13 +16,15 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
-import Tools from '../../generic/tools';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
+import { dateInc } from 'shared/generic/tools';
 
 // Local modules
-import Utils from '../../utils';
+import Utils from 'utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -74,7 +76,7 @@ export default function Prescriptions(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				Events.trigger('error', JSON.stringify(res.error));
 			}
 
@@ -106,7 +108,7 @@ export default function Prescriptions(props) {
 
 		// If it's expired
 		let oDate = new Date(rx.EffectiveDate ? rx.EffectiveDate : rx.WrittenDate);
-		if(oDate < Tools.dateInc(-365)) {
+		if(oDate < dateInc(-365)) {
 			return false;
 		}
 

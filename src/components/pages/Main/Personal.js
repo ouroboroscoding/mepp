@@ -34,18 +34,20 @@ import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
 
 // Composite components
-import Address from '../composites/Address';
+import Address from 'components/composites/Address';
 
 // Shared functions
-import supportRequest from '../functions/supportRequest';
+import supportRequest from 'components/functions/supportRequest';
 
-// Generic modules
-import Events from '../../generic/events';
-import Rest from '../../generic/rest';
-import Tools from '../../generic/tools';
+// Shared communication modules
+import Rest from 'shared/communication/rest';
+
+// Shared generic modules
+import Events from 'shared/generic/events';
+import { clone, compare } from 'shared/generic/tools';
 
 // Local modules
-import Utils from '../../utils';
+import Utils from 'utils';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
@@ -127,7 +129,7 @@ export default function Personal(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				if(res.error.code === 1900) {
 					Events.trigger('error', 'This E-mail address is already in use and can\'t be saved.');
 				} else {
@@ -156,7 +158,7 @@ export default function Personal(props) {
 		}).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				Events.trigger('error', JSON.stringify(res.error));
 			}
 
@@ -179,7 +181,7 @@ export default function Personal(props) {
 		if(billing) {
 
 			// Only update if the data is different
-			if(!Tools.compare(billing, info.billing)) {
+			if(!compare(billing, info.billing)) {
 				update('billing', billing, billingSet);
 			} else {
 				billingSet(false);
@@ -193,7 +195,7 @@ export default function Personal(props) {
 	function toggleEmail(ev) {
 		if(email) {
 			// Only update if the data is different
-			if(!Tools.compare(email, info.email)) {
+			if(!compare(email, info.email)) {
 				accountEmail(email, () => {
 					update('email', email, emailSet);
 				});
@@ -213,7 +215,7 @@ export default function Personal(props) {
 	function togglePhone(ev) {
 		if(phone) {
 			// Only update if the data is different
-			if(!Tools.compare(phone, info.phone)) {
+			if(!compare(phone, info.phone)) {
 				update('phone', phone, phoneSet);
 			} else {
 				phoneSet(false);
@@ -227,7 +229,7 @@ export default function Personal(props) {
 	function toggleShipping(ev) {
 		if(shipping) {
 			// Only update if the data is different
-			if(!Tools.compare(shipping, info.shipping)) {
+			if(!compare(shipping, info.shipping)) {
 
 				// Is it urgent
 				let urgent = urgentRef.current.checked;
@@ -259,7 +261,7 @@ export default function Personal(props) {
 		Rest.update('konnektive', 'customer', oData).done(res => {
 
 			// If there's an error
-			if(res.error && !Utils.restError(res.error)) {
+			if(res.error && !res._handled) {
 				if(res.error.code === 1700) {
 					Events.trigger('error', 'Can not connect to USPS to verify address.');
 				} else if(res.error.code === 1701) {
@@ -280,7 +282,7 @@ export default function Personal(props) {
 			if(res.data) {
 
 				// Clone the current info
-				let newInfo = Tools.clone(info);
+				let newInfo = clone(info);
 
 				// Update the part that changed
 				newInfo[type] = data;
