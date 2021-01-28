@@ -122,13 +122,13 @@ export default function Personal(props) {
 	// Update the e-mail address used for signing in
 	function accountEmail(email, success) {
 
-		// Fetch all info
+		// Send the update request
 		Rest.update('patient', 'account/email', {
 			email: email,
 			url: 'https://' + process.env.REACT_APP_SELF_DOMAIN + '/verify#key='
 		}).done(res => {
 
-			// If there's an error
+			// If there's an error or warning
 			if(res.error && !res._handled) {
 				if(res.error.code === 1900) {
 					Events.trigger('error', 'This E-mail address is already in use and can\'t be saved.');
@@ -136,8 +136,29 @@ export default function Personal(props) {
 					Events.trigger('error', JSON.stringify(res.error));
 				}
 			}
+			if(res.warning) {
+				Events.trigger('warning', JSON.stringify(res.warning));
+			}
 
-			// If there's a warning
+			// On success
+			if(res.data) {
+				success();
+			}
+		});
+	}
+
+	// Update the phone number
+	function accountPhone(phone, success) {
+
+		// Send the update request
+		Rest.update('patient', 'account/phone', {
+			phone: phone
+		}).done(res => {
+
+			// If there's an error or warning
+			if(res.error && !res._handled) {
+				Events.trigger('error', JSON.stringify(res.error));
+			}
 			if(res.warning) {
 				Events.trigger('warning', JSON.stringify(res.warning));
 			}
@@ -216,7 +237,9 @@ export default function Personal(props) {
 		if(phone) {
 			// Only update if the data is different
 			if(!compare(phone, info.phone)) {
-				update('phone', phone, phoneSet);
+				accountPhone(phone, () => {
+					update('phone', phone, phoneSet);
+				});
 			} else {
 				phoneSet(false);
 			}
