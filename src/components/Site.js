@@ -34,9 +34,7 @@ import Header from 'components/composites/Header';
 // Pages
 import Main from 'components/pages/Main';
 import CalendlySingle from 'components/pages/CalendlySingle';
-
-// Verify
-import Verify from 'components/Verify';
+import Verify from 'components/pages/Verify';
 
 // CSS Theme
 import Theme from 'components/Theme'
