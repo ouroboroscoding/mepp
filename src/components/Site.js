@@ -32,11 +32,11 @@ import Alerts from 'components/composites/Alerts';
 import Header from 'components/composites/Header';
 
 // Pages
-import Main from 'components/pages/Main';
 import CalendlySingle from 'components/pages/CalendlySingle';
-
-// Verify
-import Verify from 'components/Verify';
+import HowTo from 'components/pages/HowTo';
+import Main from 'components/pages/Main';
+import NotFound from 'components/pages/NotFound';
+import Verify from 'components/pages/Verify';
 
 // CSS Theme
 import Theme from 'components/Theme'
@@ -140,12 +140,22 @@ export default function Site(props) {
 							}
 						/>
 						<Route
+							path="/howto"
+						>
+							<HowTo
+								key={location.pathname}
+							/>
+						</Route>
+						<Route
 							exact
 							path="/verify"
 						>
 							<div className={classes.content}>
 								<Verify />
 							</div>
+						</Route>
+						<Route path="*">
+							<NotFound />
 						</Route>
 					</Switch>
 				</div>
