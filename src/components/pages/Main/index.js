@@ -23,6 +23,7 @@ import NoUser from 'components/dialogs/NoUser';
 
 // Tab component modules
 import Dashboard from './Dashboard';
+import HRT from './HRT';
 import Personal from './Personal';
 import Prescriptions from './Prescriptions';
 
@@ -60,6 +61,15 @@ export default function Main(props) {
 	// State
 	let [tab, tabSet] = useState(0);
 
+	// Tabs
+	let lTabs = ['dashboard', 'personal'];
+	if(props.user.rx_id) {
+		lTabs.push('rx');
+	}
+	if(props.user.hrt) {
+		lTabs.push('hrt');
+	}
+
 	// Render
 	if(props.user) {
 		return (
@@ -75,17 +85,23 @@ export default function Main(props) {
 						{props.user.rx_id &&
 							<Tab label="Prescriptions" />
 						}
+						{props.user.hrt &&
+							<Tab label="HRT" />
+						}
 					</Tabs>
 				</AppBar>
 				<Box className={classes.content}>
-					{tab === 0 &&
+					{lTabs[tab] === 'dashboard' &&
 						<Dashboard user={props.user} />
 					}
-					{tab === 1 &&
+					{lTabs[tab] === 'personal' &&
 						<Personal user={props.user} />
 					}
-					{tab === 2 &&
+					{lTabs[tab] === 'rx' &&
 						<Prescriptions user={props.user} />
+					}
+					{lTabs[tab] === 'hrt' &&
+						<HRT user={props.user} />
 					}
 				</Box>
 			</React.Fragment>
