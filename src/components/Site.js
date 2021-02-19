@@ -9,7 +9,7 @@
  */
 
 // NPM modules
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 
@@ -54,7 +54,7 @@ import Theme from 'components/Theme'
 import { LoaderHide, LoaderShow } from './composites/Loader';
 
 // Shared modules
-import { clone } from 'shared/generic/tools';
+import { clone, safeLocalStorageJSON } from 'shared/generic/tools';
 
 // Init the rest services
 Rest.init(process.env.REACT_APP_MEMS_DOMAIN, process.env.REACT_APP_MEMS_DOMAIN, xhr => {
@@ -125,24 +125,14 @@ export default function Site(props) {
 
 	// State
 	let [user, userSet] = useState(false);
-	let [override, overrideSet] = useState({});
+	let [override, overrideSet] = useState(safeLocalStorageJSON('overrideUser', {}));
 
 	// hooks
 	let location = useLocation();
 	useEvent('signedIn', user => userSet(user));
 	useEvent('signedOut', () => userSet(false));
 
-	// User change effect
-	useEffect(() => {
-		let oOverride = {};
-		oOverride.crm_type = user.crm_type || 'knk';
-		oOverride.crm_id = user.crm_id || '';
-		oOverride.rx_type = user.rx_type || '';
-		oOverride.rx_id = user.rx_id || '';
-		oOverride.hrt = user.hrt || false;
-		overrideSet(oOverride);
-	}, [user]);
-
+	// Called when any override fields change
 	function overrideChange(k, v) {
 		let oOverride = clone(override);
 		oOverride[k] = v;
@@ -164,6 +154,9 @@ export default function Site(props) {
 
 		// Set the new user
 		userSet(oUser);
+
+		// Store the override in case of reloads
+		localStorage.setItem('overrideUser', JSON.stringify(override));
 	}
 
 	// Render
