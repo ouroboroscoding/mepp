@@ -80,7 +80,12 @@ Rest.init(process.env.REACT_APP_MEMS_DOMAIN, process.env.REACT_APP_MEMS_DOMAIN, 
 if(Rest.session()) {
 	Rest.read('patient', 'session', {}).done(res => {
 		Rest.read('patient', 'account', {}).done(res => {
-			Events.trigger('signedIn', res.data);
+			if(res.data) {
+				Events.trigger('signedIn', res.data);
+			} else {
+				Rest.session(null);
+				Events.trigger('signedOut');
+			}
 		});
 	});
 }
