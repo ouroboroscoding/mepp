@@ -117,7 +117,7 @@ export default function HRT(props) {
 	// Render
 	return (
 		<Container>
-			<Typography className={classes.header}>HRT Assessment Symptoms</Typography>
+			<Typography className={classes.header}>HRT Assessment Levels</Typography>
 			<HormoneSymptoms
 				className={classes.symptoms}
 				customerId={props.user.crm_id}
