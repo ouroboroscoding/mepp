@@ -139,7 +139,7 @@ export default function Site(props) {
 	function overrideChange(k, v) {
 		let oOverride = clone(override);
 
-		if(k == 'hrt' && v === '0') {
+		if(k === 'hrt' && v === '0') {
 			oOverride[k] = false;
 		} else {
 			oOverride[k] = v;

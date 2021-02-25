@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	labs: {
 		'& .container': {
-			maxHeight: '400px'
+			maxHeight: '600px'
 		},
 		'& tr.dates': {
 			'& .empty': {
@@ -154,7 +154,7 @@ const useStyles = makeStyles((theme) => ({
 			zIndex: 1
 		},
 		'& td.date': {
-			minWidth: '105px',
+			width: '105px',
 			textAlign: 'center'
 		}
 	}
