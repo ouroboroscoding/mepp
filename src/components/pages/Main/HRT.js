@@ -20,6 +20,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { green, red } from '@material-ui/core/colors';
 
 // Shared components
+import LabResults from 'shared/components/monolith/LabResults';
 import HormoneSymptoms from 'shared/components/monolith/HormoneSymptoms';
 
 // Theme
@@ -28,9 +29,67 @@ const useStyles = makeStyles((theme) => ({
 		fontSize: '1.5rem',
 		fontWeight: 'bold'
 	},
+	labs: {
+		'& .container': {
+			maxHeight: '600px'
+		},
+		'& tr.dates': {
+			'& .empty': {
+				backgroundColor: '#fff'
+			},
+			'& .even, .odd': {
+				backgroundColor: '#000',
+				color: '#fff',
+				fontWeight: 'bold',
+				textAlign: 'center'
+			}
+		},
+		'& tr.test': {
+			'& td.title': {
+				backgroundColor: 'inherit',
+				'& .text': {
+					fontWeight: 'bold'
+				}
+			}
+		},
+		'& tr.test.odd': {
+			backgroundColor: '#dfdfdf'
+		},
+		'& tr.test.even': {
+			backgroundColor: '#fff'
+		},
+		'& td.title': {
+			backgroundColor: 'inherit',
+			left: '0',
+			position: 'sticky',
+			zIndex: '1'
+		},
+		'& td.date': {
+			width: '220px',
+			textAlign: 'center',
+			'& .result': {
+				display: 'flex',
+				'& .left': {
+					flexBasis: 'auto',
+					flexShrink: '0',
+					flexGrow: '0',
+					fontWeight: 'bold',
+					paddingRight: '5px',
+					textAlign: 'right'
+				},
+				'& .right': {
+					flexBasis: '0',
+					flexShrink: '1',
+					flexGrow: '1',
+					paddingLeft: '5px',
+					textAlign: 'left'
+				}
+			}
+		}
+	},
 	symptoms: {
 		'& .container': {
-			maxHeight: '400px'
+			maxHeight: '420px'
 		},
 		'& tr.dates': {
 			'& .empty': {
@@ -90,11 +149,12 @@ const useStyles = makeStyles((theme) => ({
 		'& td.title': {
 			backgroundColor: 'inherit',
 			left: 0,
+			minWidth: '240px',
 			position: 'sticky',
 			zIndex: 1
 		},
 		'& td.date': {
-			minWidth: '105px',
+			width: '105px',
 			textAlign: 'center'
 		}
 	}
@@ -122,6 +182,17 @@ export default function HRT(props) {
 				className={classes.symptoms}
 				customerId={props.user.crm_id}
 			/>
+			<br />
+			{props.user.hrt === 'Optimizing' &&
+				<React.Fragment>
+					<Typography className={classes.header}>Lab Results</Typography>
+					<LabResults
+						className={classes.labs}
+						customerId={props.user.crm_id}
+					/>
+				</React.Fragment>
+			}
+
 		</Container>
 	)
 }

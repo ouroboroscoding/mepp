@@ -16,10 +16,8 @@ import { SnackbarProvider } from 'notistack';
 // Material UI
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
@@ -140,7 +138,13 @@ export default function Site(props) {
 	// Called when any override fields change
 	function overrideChange(k, v) {
 		let oOverride = clone(override);
-		oOverride[k] = v;
+
+		if(k === 'hrt' && v === '0') {
+			oOverride[k] = false;
+		} else {
+			oOverride[k] = v;
+		}
+
 		overrideSet(oOverride);
 	}
 
@@ -198,10 +202,15 @@ export default function Site(props) {
 									<TextField label="RX ID" onChange={ev => overrideChange('rx_id', ev.currentTarget.value)} placeholder="RX ID" value={override.rx_id} variant="outlined" />
 								</Grid>
 								<Grid item xs={6} sm={4} lg={2}>
-									<FormControlLabel
-										control={<Checkbox color="primary" checked={override.hrt} onChange={ev => overrideChange('hrt', ev.currentTarget.checked)} />}
-										label="HRT"
-									/>
+									<FormControl variant="outlined">
+										<InputLabel>HRT Stage</InputLabel>
+										<Select label="HRT Stage" native onChange={ev => overrideChange('hrt', ev.currentTarget.value)} value={override.hrt || '0'}>
+											<option value="0"></option>
+											<option value="Onboarding">Onboarding</option>
+											<option value="Optimizing">Optimizing</option>
+											<option value="Dropped">Dropped</option>
+										</Select>
+									</FormControl>
 								</Grid>
 								<Grid item xs={6} sm={4} lg={2}>
 									<Button color="primary" onClick={overrideCustomer} variant="contained">Override</Button>
