@@ -170,7 +170,7 @@ export default function Site(props) {
 
 	// Render
 	return (
-		<SnackbarProvider maxSnack={3}>
+		<SnackbarProvider autoHideDuration={8000} maxSnack={3}>
 			<Alerts />
 			<ThemeProvider theme={Theme}>
 				<CssBaseline />
