@@ -471,7 +471,7 @@ export default function Personal(props) {
 								</TableCell>
 								<TableCell className="edit">
 									{payment === 2 ?
-										<img src="/images/loading.gif" />
+										<img src="/images/loading.gif" alt="loading" />
 									:
 										<Tooltip title={(payment ? 'Save' : 'Edit') + ' Payment Info'}><IconButton onClick={togglePayment}>{payment ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
 									}
