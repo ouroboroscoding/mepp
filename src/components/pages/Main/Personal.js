@@ -385,6 +385,7 @@ export default function Personal(props) {
 				} else {
 					Events.trigger('error', JSON.stringify(res.error));
 				}
+				paymentSet(1);
 			}
 			if(res.warning) {
 				Events.trigger('warning', JSON.stringify(res.warning));
