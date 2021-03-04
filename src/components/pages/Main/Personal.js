@@ -15,10 +15,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
@@ -27,6 +23,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 // Material UI Icons
@@ -35,6 +32,7 @@ import SaveIcon from '@material-ui/icons/Save';
 
 // Composite components
 import Address from 'components/composites/Address';
+import CreditCard from 'components/composites/CreditCard';
 
 // Shared functions
 import supportRequest from 'components/functions/supportRequest';
@@ -78,6 +76,34 @@ const useStyles = makeStyles((theme) => ({
 			},
 			alignItems: 'flex-start'
 		}
+	},
+	cc: {
+		'& .rccs': {
+			margin: '0'
+		},
+		'& .CreditCard_preview': {
+			marginBottom: '10px'
+		},
+		'& .CreditCard_section': {
+			marginBottom: '10px',
+			'& .CreditCard_number, .CreditCard_name': {
+				width: '145px'
+			},
+			'& .CreditCard_expiry': {
+				marginRight: '55px',
+				width: '50px'
+			},
+			'& .CreditCard_code': {
+				width: '40px'
+			},
+			'& input::-webkit-outer-spin-button,input::-webkit-inner-spin-button': {
+				'-webkit-appearance': 'none',
+				margin: 0
+			},
+			'& input[type=number]': {
+				'-moz-appearance': 'textfield'
+			}
+		}
 	}
 }));
 
@@ -99,13 +125,14 @@ export default function Personal(props) {
 	let [billing, billingSet] = useState(false);
 	let [email, emailSet] = useState(false);
 	let [info, infoSet] = useState(null);
-	let [payment, paymentSet] = useState(false);
+	let [payment, paymentSet] = useState(0);
 	let [phone, phoneSet] = useState(false);
 	let [shipping, shippingSet] = useState(false);
 	let [urgent, urgentSet] = useState(false);
 
 	// Refs
-	let urgentRef = useRef();
+	let refUrgent = useRef();
+	let refCC = useRef();
 
 	// Fetch info effect
 	useEffect(() => {
@@ -229,7 +256,11 @@ export default function Personal(props) {
 	}
 
 	function togglePayment(ev) {
-		paymentSet(val => !val);
+		if(payment) {
+			updatePayment();
+		} else {
+			paymentSet(1);
+		}
 	}
 
 	// Toggle phone mode
@@ -255,7 +286,7 @@ export default function Personal(props) {
 			if(!compare(shipping, info.shipping)) {
 
 				// Is it urgent
-				let urgent = urgentRef.current.checked;
+				let urgent = refUrgent.current.checked;
 
 				// Send the request to the service
 				update('shipping', shipping, shippingSet, () => {
@@ -325,6 +356,63 @@ export default function Personal(props) {
 		});
 	}
 
+	// Update payment info
+	function updatePayment() {
+
+		// Get the payment info
+		let oPayment = refCC.current.value;
+
+		// If the card is invalid
+		if(!oPayment.valid && process.env.REACT_APP_ALLOW_INVALID_CC !== 'true') {
+			Events.trigger('Credit card information is not valid. Please verify your info before submitting again.');
+			return;
+		}
+
+		// Show loading icon
+		paymentSet(2);
+
+		// Make the request to the server
+		Rest.update('patient', 'account/payment', {
+			cc_number: oPayment.number,
+			cc_expiry: oPayment.expiry,
+			cc_cvc: oPayment.cvc
+		}).done(res => {
+
+			// If there's an error or warning
+			if(res.error && !res._handled) {
+				if(res.error.code === 1100) {
+					Events.trigger('error', res.error.msg);
+				} else {
+					Events.trigger('error', JSON.stringify(res.error));
+				}
+			}
+			if(res.warning) {
+				Events.trigger('warning', JSON.stringify(res.warning));
+			}
+
+			// If we were successful
+			if(res.data) {
+
+				// Clone the current info
+				let newInfo = clone(info);
+
+				// Update payment info
+				newInfo.pay = {
+					type: oPayment.issuer.toUpperCase(),
+					last4: oPayment.number.substr(oPayment.number.length - 4),
+					expires: '20' + oPayment.expiry.substr(2,2) + '-' + oPayment.expiry.substr(0,2)
+				}
+
+				// Update the state
+				infoSet(newInfo);
+				paymentSet(0);
+
+				// Success message
+				Events.trigger('success', 'Your new card information has been registered. You may see a zero dollar authorization on your statement. This happens when the system checks to see if your card is valid.');
+			}
+		})
+	}
+
 	// If we have a user
 	if(props.user) {
 
@@ -359,12 +447,33 @@ export default function Personal(props) {
 							<TableRow>
 								<TableCell className="descr">Payment</TableCell>
 								<TableCell className="content">
-									<p>{info.pay.type}</p>
-									<p>**** **** **** {info.pay.last4}</p>
-									<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
+									{payment > 0 ?
+										<React.Fragment>
+											<CreditCard
+												allowNameChange={false}
+												className={classes.cc}
+												name={info.billing.firstName + ' ' + info.billing.lastName}
+												ref={refCC}
+											/>
+											<Typography>If your billing address has changed please be sure to update it before submitting updated credit card info.</Typography>
+											<hr />
+											<Typography>If you do not wish to change your card online, please contact support or click the button below to have a support agent contact you as soon as one is available.</Typography>
+											<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
+										</React.Fragment>
+									:
+										<React.Fragment>
+											<p>{info.pay.type}</p>
+											<p>**** **** **** {info.pay.last4}</p>
+											<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
+										</React.Fragment>
+									}
 								</TableCell>
 								<TableCell className="edit">
-									<Tooltip title="Edit Payment Info"><IconButton onClick={togglePayment}><EditIcon /></IconButton></Tooltip>
+									{payment === 2 ?
+										<img src="/images/loading.gif" />
+									:
+										<Tooltip title={(payment ? 'Save' : 'Edit') + ' Payment Info'}><IconButton onClick={togglePayment}>{payment ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+									}
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -391,7 +500,7 @@ export default function Personal(props) {
 									<Box>
 										<Address name="shipping" onChange={ev => shippingSet(ev.currentTarget.value)} value={shipping} />
 										<FormControlLabel
-											control={<Checkbox color="primary" checked={urgent} onChange={ev => urgentSet(ev.currentTarget.checked)} inputRef={urgentRef} />}
+											control={<Checkbox color="primary" checked={urgent} onChange={ev => urgentSet(ev.currentTarget.checked)} inputRef={refUrgent} />}
 											label="Check this box if this address change is urgent for an order that's been billed but not shipped yet"
 										/>
 									</Box> :
@@ -411,26 +520,6 @@ export default function Personal(props) {
 							</TableRow>
 						</TableBody>
 					</Table>
-					{payment &&
-						<Dialog
-							onClose={togglePayment}
-							fullWidth={true}
-							maxWidth="sm"
-							open={true}
-						>
-							<DialogTitle>Payment</DialogTitle>
-							<DialogContent dividers>
-								<p>Please note we do not allow changing payment
-								information via the patient portal. Please contact
-								support or click the button below to have a support
-								agent contact you as soon as one is available.</p>
-							</DialogContent>
-							<DialogActions>
-								<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
-								<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
-							</DialogActions>
-						</Dialog>
-					}
 				</Box>
 			);
 		}
