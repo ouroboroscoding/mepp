@@ -364,7 +364,7 @@ export default function Personal(props) {
 
 		// If the card is invalid
 		if(!oPayment.valid && process.env.REACT_APP_ALLOW_INVALID_CC !== 'true') {
-			Events.trigger('Credit card information is not valid. Please verify your info before submitting again.');
+			Events.trigger('error', 'Credit card information is not valid. Please verify your info before submitting again.');
 			return;
 		}
 
