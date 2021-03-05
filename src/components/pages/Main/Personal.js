@@ -459,7 +459,7 @@ export default function Personal(props) {
 											<Typography>If your billing address has changed please be sure to update it before submitting updated credit card info.</Typography>
 											<hr />
 											<Typography>If you do not wish to change your card online, please contact support or click the button below to have a support agent contact you as soon as one is available.</Typography>
-											<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
+											<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Please Contact Me</Button>
 										</React.Fragment>
 									:
 										<React.Fragment>
