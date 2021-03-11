@@ -15,6 +15,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
@@ -125,7 +129,7 @@ export default function Personal(props) {
 	let [billing, billingSet] = useState(false);
 	let [email, emailSet] = useState(false);
 	let [info, infoSet] = useState(null);
-	let [payment, paymentSet] = useState(0);
+	let [payment, paymentSet] = useState(false);
 	let [phone, phoneSet] = useState(false);
 	let [shipping, shippingSet] = useState(false);
 	let [urgent, urgentSet] = useState(false);
@@ -256,11 +260,12 @@ export default function Personal(props) {
 	}
 
 	function togglePayment(ev) {
-		if(payment) {
+		paymentSet(val => !val);
+		/*if(payment) {
 			updatePayment();
 		} else {
 			paymentSet(1);
-		}
+		}*/
 	}
 
 	// Toggle phone mode
@@ -447,7 +452,7 @@ export default function Personal(props) {
 							</TableRow>
 							<TableRow>
 								<TableCell className="descr">Payment</TableCell>
-								<TableCell className="content">
+								{/*<TableCell className="content">
 									{payment > 0 ?
 										<React.Fragment>
 											<CreditCard
@@ -470,11 +475,19 @@ export default function Personal(props) {
 									}
 								</TableCell>
 								<TableCell className="edit">
-									{payment === 2 ?
+									{/*payment === 2 ?
 										<img src="/images/loading.gif" alt="loading" />
 									:
 										<Tooltip title={(payment ? 'Save' : 'Edit') + ' Payment Info'}><IconButton onClick={togglePayment}>{payment ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
 									}
+								</TableCell>*/}
+								<TableCell className="content">
+									<p>{info.pay.type}</p>
+									<p>**** **** **** {info.pay.last4}</p>
+									<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
+								</TableCell>
+								<TableCell className="edit">
+									<Tooltip title="Edit Payment Info"><IconButton onClick={togglePayment}><EditIcon /></IconButton></Tooltip>
 								</TableCell>
 							</TableRow>
 							<TableRow>
@@ -521,6 +534,26 @@ export default function Personal(props) {
 							</TableRow>
 						</TableBody>
 					</Table>
+					{payment &&
+						<Dialog
+							onClose={togglePayment}
+							fullWidth={true}
+							maxWidth="sm"
+							open={true}
+						>
+							<DialogTitle>Payment</DialogTitle>
+							<DialogContent dividers>
+								<p>Please note we do not allow changing payment
+								information via the patient portal. Please contact
+								support or click the button below to have a support
+								agent contact you as soon as one is available.</p>
+							</DialogContent>
+							<DialogActions>
+								<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
+								<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
+							</DialogActions>
+						</Dialog>
+					}
 				</Box>
 			);
 		}
