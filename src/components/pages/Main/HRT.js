@@ -178,11 +178,11 @@ export default function HRT(props) {
 	return (
 		<Container>
 			<Typography className={classes.header}>HRT Assessment Levels</Typography>
-			<HormoneSymptoms
+			{/*<HormoneSymptoms
 				className={classes.symptoms}
 				customerId={props.user.crm_id}
 			/>
-			<br />
+			<br />*/}
 			{props.user.hrt === 'Optimizing' &&
 				<React.Fragment>
 					<Typography className={classes.header}>Lab Results</Typography>
@@ -192,7 +192,6 @@ export default function HRT(props) {
 					/>
 				</React.Fragment>
 			}
-
 		</Container>
 	)
 }
