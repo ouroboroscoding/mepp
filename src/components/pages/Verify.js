@@ -57,7 +57,7 @@ export default function Verify(props) {
 		// Send it to the service
 		Rest.update('patient', 'account/verify', {
 			"key": sKey
-		}).done(res => {
+		}, {session: false}).done(res => {
 
 			// If there's an error
 			if(res.error && !res._handled) {
