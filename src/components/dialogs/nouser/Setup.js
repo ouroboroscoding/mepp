@@ -163,7 +163,7 @@ export default function Setup(props) {
 							helperText={errors.lname || ''}
 							inputProps={{
 								autocapitalize: 'off',
-								autocomplete: 'off',
+								autocomplete: 'new-password',
 								spellcheck: 'false',
 								autocorrect: 'off',
 							}}
@@ -193,6 +193,12 @@ export default function Setup(props) {
 							className={classes.passwd}
 							error={errors.passwd ? true : false}
 							helperText={errors.passwd || ''}
+							inputProps={{
+								autocapitalize: 'off',
+								autocomplete: 'new-password',
+								spellcheck: 'false',
+								autocorrect: 'off',
+							}}
 							inputRef={passRef}
 							label="Choose Password"
 							onKeyPress={keyPressed}
@@ -204,6 +210,12 @@ export default function Setup(props) {
 							className={classes.passwd}
 							error={errors.confirm ? true : false}
 							helperText={errors.confirm || ''}
+							inputProps={{
+								autocapitalize: 'off',
+								autocomplete: 'new-password',
+								spellcheck: 'false',
+								autocorrect: 'off',
+							}}
 							inputRef={confirmRef}
 							label="Confirm Password"
 							onKeyPress={keyPressed}
