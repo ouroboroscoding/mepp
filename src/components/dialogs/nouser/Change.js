@@ -88,8 +88,8 @@ export default function Change(props) {
 						Hash.set('key', null);
 						break;
 					case 1904:
-						Events.trigger('error', 'New password not strong enough');
-						errorsSet({"key": 'Must contain at least one uppercase, lowercase, and numeric character'});
+						Events.trigger('error', 'Password must be at least 8 characters with one uppercase, one lowercase, and one numeric character');
+						errorsSet({"passwd": 'Weak Password. Password must be at least 8 characters with one uppercase, one lowercase, and one numeric character'});
 						break;
 					default:
 						Events.trigger('error', JSON.stringify(res.error));

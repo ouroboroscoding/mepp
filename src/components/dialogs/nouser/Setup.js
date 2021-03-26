@@ -78,7 +78,7 @@ export default function Setup(props) {
 		// Call the setup
 		Rest.create('patient', 'setup/validate', {
 			"key": props.keyVal,
-			"lname": lnameRef.current.value,
+			"lname": lnameRef.current.value.trim(),
 			"dob": dobRef.current.value,
 			"passwd": passRef.current.value
 		}, {session: false}).done(res => {
@@ -106,8 +106,8 @@ export default function Setup(props) {
 						forgotSet(true);
 						break;
 					case 1904:
-						Events.trigger('error', 'Password must be at least 8 characters and contain one uppercase, one lowercase, and one numeric character');
-						errorsSet({"passwd": 'Weak Password'});
+						Events.trigger('error', 'Password must be at least 8 characters with one uppercase, one lowercase, and one numeric character');
+						errorsSet({"passwd": 'Weak Password. Password must be at least 8 characters with one uppercase, one lowercase, and one numeric character'});
 						break;
 					case 1905:
 						Events.trigger('error', 'The account setup key provided is not valid, please make sure you copied the URL from your email correctly. If you continue to have trouble, please contact support.');
@@ -161,6 +161,12 @@ export default function Setup(props) {
 							className={classes.lname}
 							error={errors.lname ? true : false}
 							helperText={errors.lname || ''}
+							inputProps={{
+								autocapitalize: 'off',
+								autocomplete: 'new-password',
+								spellcheck: 'false',
+								autocorrect: 'off',
+							}}
 							inputRef={lnameRef}
 							label="Last Name"
 							onKeyPress={keyPressed}
@@ -187,6 +193,12 @@ export default function Setup(props) {
 							className={classes.passwd}
 							error={errors.passwd ? true : false}
 							helperText={errors.passwd || ''}
+							inputProps={{
+								autocapitalize: 'off',
+								autocomplete: 'new-password',
+								spellcheck: 'false',
+								autocorrect: 'off',
+							}}
 							inputRef={passRef}
 							label="Choose Password"
 							onKeyPress={keyPressed}
@@ -198,6 +210,12 @@ export default function Setup(props) {
 							className={classes.passwd}
 							error={errors.confirm ? true : false}
 							helperText={errors.confirm || ''}
+							inputProps={{
+								autocapitalize: 'off',
+								autocomplete: 'new-password',
+								spellcheck: 'false',
+								autocorrect: 'off',
+							}}
 							inputRef={confirmRef}
 							label="Confirm Password"
 							onKeyPress={keyPressed}
