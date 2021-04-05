@@ -9,6 +9,7 @@
  */
 
 // NPM modules
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Material UI
@@ -194,4 +195,9 @@ export default function HRT(props) {
 			}
 		</Container>
 	)
+}
+
+// Valid props
+HRT.propTypes = {
+	user: PropTypes.object.isRequired
 }

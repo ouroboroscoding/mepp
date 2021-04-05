@@ -9,6 +9,7 @@
  */
 
 // NPM modules
+import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 
 // Material UI
@@ -298,6 +299,9 @@ export default function Personal(props) {
 					if(urgent) {
 						supportRequest('urgent_address');
 					}
+					if(props.user.hrt) {
+						supportRequest('hrt_address');
+					}
 				});
 			} else {
 				shippingSet(false);
@@ -562,4 +566,9 @@ export default function Personal(props) {
 	else {
 		return <React.Fragment />
 	}
+}
+
+// Valid props
+Personal.propTypes = {
+	user: PropTypes.object.isRequired
 }
