@@ -10,6 +10,7 @@
 
 // NPM modules
 import { Decimal } from 'decimal.js';
+import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
 // Material UI
@@ -267,4 +268,9 @@ export default function Dashboard(props) {
 	else {
 		return <React.Fragment />
 	}
+}
+
+// Valid props
+Dashboard.propTypes = {
+	user: PropTypes.object.isRequired
 }
