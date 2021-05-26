@@ -28,7 +28,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
+//import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 // Material UI Icons
@@ -37,7 +37,7 @@ import SaveIcon from '@material-ui/icons/Save';
 
 // Composite components
 import Address from 'components/composites/Address';
-import CreditCard from 'components/composites/CreditCard';
+//import CreditCard from 'components/composites/CreditCard';
 
 // Shared functions
 import supportRequest from 'components/functions/supportRequest';
@@ -137,7 +137,7 @@ export default function Personal(props) {
 
 	// Refs
 	let refUrgent = useRef();
-	let refCC = useRef();
+	//let refCC = useRef();
 
 	// Fetch info effect
 	useEffect(() => {
@@ -366,7 +366,7 @@ export default function Personal(props) {
 	}
 
 	// Update payment info
-	function updatePayment() {
+	/*function updatePayment() {
 
 		// Get the payment info
 		let oPayment = refCC.current.value;
@@ -421,7 +421,7 @@ export default function Personal(props) {
 				Events.trigger('success', 'Your new card information has been registered. You may see a zero dollar authorization on your statement. This happens when the system checks to see if your card is valid.');
 			}
 		})
-	}
+	}*/
 
 	// If we have a user
 	if(props.user) {
@@ -437,7 +437,7 @@ export default function Personal(props) {
 							<TableRow>
 								<TableCell className="descr">Phone Number</TableCell>
 								<TableCell className="content">{phone ?
-									<TextField name="phone" onChange={ev => phoneSet(ev.currentTarget.value)} type="text" value={phone} /> :
+									<TextField inputProps={{maxLength: 11}} name="phone" onChange={ev => phoneSet(ev.currentTarget.value)} type="text" error={phone.length > 10} helperText="Can not exceed 10 digits, e.g. 5553210101" value={phone} /> :
 									Utils.nicePhone(info.phone)
 								}</TableCell>
 								<TableCell className="edit">
