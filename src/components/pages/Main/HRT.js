@@ -22,7 +22,7 @@ import { green, red } from '@material-ui/core/colors';
 
 // Shared components
 import LabResults from 'shared/components/monolith/LabResults';
-import HormoneSymptoms from 'shared/components/monolith/HormoneSymptoms';
+//import HormoneSymptoms from 'shared/components/monolith/HormoneSymptoms';
 
 // Theme
 const useStyles = makeStyles((theme) => ({
