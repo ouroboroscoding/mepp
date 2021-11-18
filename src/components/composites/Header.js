@@ -82,7 +82,16 @@ const useStyles = makeStyles((theme) => ({
 	}
 }));
 
-// Header component
+/**
+ * Header
+ *
+ * Header component
+ *
+ * @name Header
+ * @access public
+ * @param Object props Properties passed to the component
+ * @return React.Component
+ */
 export default function Header(props) {
 
 	// Styles
