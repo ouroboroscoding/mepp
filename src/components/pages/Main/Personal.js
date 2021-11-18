@@ -16,10 +16,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
@@ -28,7 +24,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
-//import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 // Material UI Icons
@@ -37,7 +33,8 @@ import SaveIcon from '@material-ui/icons/Save';
 
 // Composite components
 import Address from 'components/composites/Address';
-//import CreditCard from 'components/composites/CreditCard';
+import CreditCard from 'components/composites/CreditCard';
+import Passwd from 'components/composites/Passwd';
 
 // Shared functions
 import supportRequest from 'components/functions/supportRequest';
@@ -47,7 +44,7 @@ import Rest from 'shared/communication/rest';
 
 // Shared generic modules
 import Events from 'shared/generic/events';
-import { clone, compare } from 'shared/generic/tools';
+import { afindi, clone, compare } from 'shared/generic/tools';
 
 // Local modules
 import Utils from 'utils';
@@ -118,6 +115,7 @@ const useStyles = makeStyles((theme) => ({
  * Shows personal info associated with the patient
  *
  * @name Personal
+ * @access public
  * @param Object props Properties passed to the component
  * @return React.Component
  */
@@ -130,14 +128,16 @@ export default function Personal(props) {
 	let [billing, billingSet] = useState(false);
 	let [email, emailSet] = useState(false);
 	let [info, infoSet] = useState(null);
+	let [passwd, passwdSet] = useState(false);
 	let [payment, paymentSet] = useState(false);
+	let [paySource, paySourceSet] = useState(false);
 	let [phone, phoneSet] = useState(false);
 	let [shipping, shippingSet] = useState(false);
 	let [urgent, urgentSet] = useState(false);
 
 	// Refs
 	let refUrgent = useRef();
-	//let refCC = useRef();
+	let refCC = useRef();
 
 	// Fetch info effect
 	useEffect(() => {
@@ -223,6 +223,14 @@ export default function Personal(props) {
 			// If there's data
 			if(res.data) {
 
+				// Look for the default
+				let iIndex = afindi(res.data.paySources, 'default', true);
+
+				// If we found one
+				if(iIndex > -1) {
+					paySourceSet(res.data.paySources[iIndex]);
+				}
+
 				// Set the info
 				infoSet(res.data);
 			}
@@ -260,13 +268,24 @@ export default function Personal(props) {
 		}
 	}
 
+	function togglePasswd(ev) {
+		if(passwd) {
+			updatePasswd();
+		} else {
+			passwdSet({
+				old_passwd: '',
+				passwd: '',
+				confirm: ''
+			});
+		}
+	}
+
 	function togglePayment(ev) {
-		paymentSet(val => !val);
-		/*if(payment) {
+		if(payment) {
 			updatePayment();
 		} else {
 			paymentSet(1);
-		}*/
+		}
 	}
 
 	// Toggle phone mode
@@ -365,8 +384,53 @@ export default function Personal(props) {
 		});
 	}
 
+	// Update passwd info
+	function updatePasswd() {
+
+		// Clone the password data
+		let dData = clone(passwd);
+
+		// If the password doesn't match
+		if(dData.passwd !== dData.confirm) {
+			Events.trigger('error', 'Passwords do not match.');
+			return;
+		}
+
+		// Show loading icon
+		passwdSet(2);
+
+		// Make the request to the server
+		Rest.update('patient', 'account/passwd', dData).done(res => {
+
+			// If there's an error or warning
+			if(res.error && !res._handled) {
+				if(res.error.code === 1901) {
+					Events.trigger('error', 'Your current password is invalid.');
+				} else if(res.error.code === 1904) {
+					Events.trigger('error', 'Password must be at least 8 characters with one uppercase, one lowercase, and one numeric character');
+				} else {
+					Events.trigger('error', JSON.stringify(res.error));
+				}
+				passwdSet(dData);
+			}
+			if(res.warning) {
+				Events.trigger('warning', JSON.stringify(res.warning));
+			}
+
+			// If we were successful
+			if(res.data) {
+
+				// Update the state
+				passwdSet(false);
+
+				// Success message
+				Events.trigger('success', 'Your password has been successfully changed.');
+			}
+		})
+	}
+
 	// Update payment info
-	/*function updatePayment() {
+	function updatePayment() {
 
 		// Get the payment info
 		let oPayment = refCC.current.value;
@@ -384,12 +448,13 @@ export default function Personal(props) {
 		Rest.update('patient', 'account/payment', {
 			cc_number: oPayment.number,
 			cc_expiry: oPayment.expiry,
-			cc_cvc: oPayment.cvc
+			cc_cvc: oPayment.cvc,
+			source_id: paySource.id
 		}).done(res => {
 
 			// If there's an error or warning
 			if(res.error && !res._handled) {
-				if(res.error.code === 1100) {
+				if(res.error.code === 1103) {
 					Events.trigger('error', res.error.msg);
 				} else {
 					Events.trigger('error', JSON.stringify(res.error));
@@ -404,24 +469,22 @@ export default function Personal(props) {
 			if(res.data) {
 
 				// Clone the current info
-				let newInfo = clone(info);
+				let newPaySource = clone(paySource);
 
 				// Update payment info
-				newInfo.pay = {
-					type: oPayment.issuer.toUpperCase(),
-					last4: oPayment.number.substr(oPayment.number.length - 4),
-					expires: '20' + oPayment.expiry.substr(2,2) + '-' + oPayment.expiry.substr(0,2)
-				}
+				newPaySource.cardType = oPayment.issuer.toUpperCase();
+				newPaySource.cardLast4 = oPayment.number.substr(oPayment.number.length - 4);
+				newPaySource.cardExpires = oPayment.expiry;
 
 				// Update the state
-				infoSet(newInfo);
+				paySourceSet(newPaySource);
 				paymentSet(0);
 
 				// Success message
 				Events.trigger('success', 'Your new card information has been registered. You may see a zero dollar authorization on your statement. This happens when the system checks to see if your card is valid.');
 			}
 		})
-	}*/
+	}
 
 	// If we have a user
 	if(props.user) {
@@ -434,6 +497,20 @@ export default function Personal(props) {
 				<Box className={classes.box}>
 					<Table className={classes.table}>
 						<TableBody>
+							<TableRow>
+								<TableCell className="descr">Password</TableCell>
+								<TableCell className="content">{passwd ?
+									<Passwd name="passwd" onChange={ev => passwdSet(ev.currentTarget.value)} value={passwd} /> :
+									'********'
+								}</TableCell>
+								<TableCell className="edit">
+									{payment === 2 ?
+										<img src="/images/loading.gif" alt="loading" />
+									:
+										<Tooltip title={(passwd ? 'Save' : 'Change') + ' Password'}><IconButton onClick={togglePasswd}>{passwd ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+									}
+								</TableCell>
+							</TableRow>
 							<TableRow>
 								<TableCell className="descr">Phone Number</TableCell>
 								<TableCell className="content">{phone ?
@@ -454,46 +531,40 @@ export default function Personal(props) {
 									<Tooltip title={(email ? 'Save' : 'Edit') + ' E-mail Address'}><IconButton onClick={toggleEmail}>{email ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
 								</TableCell>
 							</TableRow>
-							<TableRow>
-								<TableCell className="descr">Payment</TableCell>
-								{/*<TableCell className="content">
-									{payment > 0 ?
-										<React.Fragment>
-											<CreditCard
-												allowNameChange={false}
-												className={classes.cc}
-												name={info.billing.firstName + ' ' + info.billing.lastName}
-												ref={refCC}
-											/>
-											<Typography>If your billing address has changed please be sure to update it before submitting updated credit card info.</Typography>
-											<hr />
-											<Typography>If you do not wish to change your card online, please contact support or click the button below to have a support agent contact you as soon as one is available.</Typography>
-											<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Please Contact Me</Button>
-										</React.Fragment>
-									:
-										<React.Fragment>
-											<p>{info.pay.type}</p>
-											<p>**** **** **** {info.pay.last4}</p>
-											<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
-										</React.Fragment>
-									}
-								</TableCell>
-								<TableCell className="edit">
-									{/*payment === 2 ?
-										<img src="/images/loading.gif" alt="loading" />
-									:
-										<Tooltip title={(payment ? 'Save' : 'Edit') + ' Payment Info'}><IconButton onClick={togglePayment}>{payment ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
-									}
-								</TableCell>*/}
-								<TableCell className="content">
-									<p>{info.pay.type}</p>
-									<p>**** **** **** {info.pay.last4}</p>
-									<p>{info.pay.expires.substr(5,2)}/{info.pay.expires.substr(0,4)}</p>
-								</TableCell>
-								<TableCell className="edit">
-									<Tooltip title="Edit Payment Info"><IconButton onClick={togglePayment}><EditIcon /></IconButton></Tooltip>
-								</TableCell>
-							</TableRow>
+							{paySource &&
+								<TableRow>
+									<TableCell className="descr">Payment</TableCell>
+									<TableCell className="content">
+										{payment > 0 ?
+											<React.Fragment>
+												<CreditCard
+													allowNameChange={false}
+													className={classes.cc}
+													name={info.billing.firstName + ' ' + info.billing.lastName}
+													ref={refCC}
+												/>
+												<Typography>If your billing address has changed please be sure to update it before submitting updated credit card info.</Typography>
+												<hr />
+												<Typography>If you do not wish to change your card online, please contact support or click the button below to have a support agent contact you as soon as one is available.</Typography>
+												<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Please Contact Me</Button>
+											</React.Fragment>
+										:
+											<React.Fragment>
+												<p>{paySource.cardType}</p>
+												<p>**** **** **** {paySource.cardLast4}</p>
+												<p>{paySource.cardExpires}</p>
+											</React.Fragment>
+										}
+									</TableCell>
+									<TableCell className="edit">
+										{payment === 2 ?
+											<img src="/images/loading.gif" alt="loading" />
+										:
+											<Tooltip title={(payment ? 'Save' : 'Edit') + ' Payment Info'}><IconButton onClick={togglePayment}>{payment ? <SaveIcon /> : <EditIcon />}</IconButton></Tooltip>
+										}
+									</TableCell>
+								</TableRow>
+							}
 							<TableRow>
 								<TableCell className="descr">Billing Address</TableCell>
 								<TableCell className="content">{billing ?
@@ -538,26 +609,6 @@ export default function Personal(props) {
 							</TableRow>
 						</TableBody>
 					</Table>
-					{payment &&
-						<Dialog
-							onClose={togglePayment}
-							fullWidth={true}
-							maxWidth="sm"
-							open={true}
-						>
-							<DialogTitle>Payment</DialogTitle>
-							<DialogContent dividers>
-								<p>Please note we do not allow changing payment
-								information via the patient portal. Please contact
-								support or click the button below to have a support
-								agent contact you as soon as one is available.</p>
-							</DialogContent>
-							<DialogActions>
-								<Button variant="contained" color="secondary" onClick={togglePayment}>Cancel</Button>
-								<Button variant="contained" color="primary" onClick={ev => supportRequest('payment', () => paymentSet(false))}>Have Support Contact You</Button>
-							</DialogActions>
-						</Dialog>
-					}
 				</Box>
 			);
 		}

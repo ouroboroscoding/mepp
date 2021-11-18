@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
  * Handles fetching and validating address info
  *
  * @name Address
+ * @access public
+ * @param Object props Properties passed to the component
+ * @return React.Component
  */
 export default function Address(props) {
 
