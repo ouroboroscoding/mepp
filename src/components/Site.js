@@ -24,11 +24,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
-// Shared communication modules
-import Rest from 'shared/communication/rest';
-
 // Shared generic modules
-import Events from 'shared/generic/events';
 import Hash from 'shared/generic/hash';
 
 // Hooks
@@ -47,9 +43,6 @@ import Verify from 'components/pages/Verify';
 
 // CSS Theme
 import Theme from 'components/Theme'
-
-// Local modules
-import { LoaderHide, LoaderShow } from './composites/Loader';
 
 // Shared modules
 import { clone, safeLocalStorageJSON } from 'shared/generic/tools';

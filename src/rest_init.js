@@ -8,9 +8,6 @@
  * @created 2021-12-01
  */
 
-// Error codes/messages
-import errors from 'definitions/errors';
-
 // Shared communication modules
 import Rest from 'shared/communication/rest';
 
@@ -18,7 +15,7 @@ import Rest from 'shared/communication/rest';
 import Events from 'shared/generic/events';
 
 // Local modules
-import { LoaderHide, LoaderShow } from './composites/Loader';
+import { LoaderHide, LoaderShow } from 'components/composites/Loader';
 
 // Init the rest services
 Rest.init(process.env.REACT_APP_MEMS_DOMAIN, {
@@ -50,9 +47,6 @@ Rest.init(process.env.REACT_APP_MEMS_DOMAIN, {
 				' (' + xhr.status + ')');
 		}
 	},
-
-	// Error codes
-	errors: errors,
 
 	// Called after a request is successful from an HTTP standpoint
 	success: res => {
