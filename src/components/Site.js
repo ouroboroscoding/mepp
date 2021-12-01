@@ -24,11 +24,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 
-// Shared communication modules
-import Rest from 'shared/communication/rest';
-
 // Shared generic modules
-import Events from 'shared/generic/events';
 import Hash from 'shared/generic/hash';
 
 // Hooks
@@ -48,51 +44,11 @@ import Verify from 'components/pages/Verify';
 // CSS Theme
 import Theme from 'components/Theme'
 
-// Local modules
-import { LoaderHide, LoaderShow } from './composites/Loader';
-
 // Shared modules
 import { clone, safeLocalStorageJSON } from 'shared/generic/tools';
 
-// Init the rest services
-Rest.init(process.env.REACT_APP_MEMS_DOMAIN, process.env.REACT_APP_MEMS_DOMAIN, xhr => {
-
-	// If we got a 401, let everyone know we signed out
-	if(xhr.status === 401) {
-		Events.trigger('error', 'Your session has expired');
-		Events.trigger('signedOut');
-	} else {
-		console.error('Rest call failed: ', xhr);
-		Events.trigger('error',
-			'Unable to connect to ' + process.env.REACT_APP_MEMS_DOMAIN +
-			': ' + xhr.statusText +
-			' (' + xhr.status + ')');
-	}
-}, (method, url, data) => {
-	LoaderShow();
-}, (method, url, data) => {
-	LoaderHide();
-});
-
-// If we have a session, fetch the user
-if(Rest.session()) {
-	Rest.read('patient', 'session', {}).done(res => {
-		Rest.read('patient', 'account', {}).done(res => {
-			if(res.data) {
-				Events.trigger('signedIn', res.data);
-			} else {
-				Rest.session(null);
-				Events.trigger('signedOut');
-			}
-		});
-	});
-}
-
-// Make Events available from console
-window.Events = Events;
-
-// Hide the loader
-LoaderHide();
+// Rest
+import 'rest_init';
 
 // Init the Hash module
 Hash.init();
